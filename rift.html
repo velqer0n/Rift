@@ -146,8 +146,10 @@ button{-webkit-tap-highlight-color:transparent}
 .chip.warn{border-color:var(--warn);color:var(--warn)}
 .chip.bad{border-color:var(--rust);color:var(--rust)}
 .item .nm span.mut{white-space:normal}
-.cfield{position:relative;height:110px;overflow:hidden;background:linear-gradient(180deg,#0C1015,#141A22);
-  border:1px solid var(--line);border-radius:8px;margin-top:8px;overflow:hidden}
+.cfield{position:relative;height:160px;min-height:160px;overflow:visible;background:linear-gradient(180deg,#0C1015,#141A22);
+  border:1px solid var(--line);border-radius:8px;margin-top:8px}
+.cfield .ctok{z-index:2;pointer-events:auto}
+.ctok .ci-emoji{font-size:22px;line-height:1.1;display:block;filter:drop-shadow(0 1px 2px #000)}
 .cfield.crowded{height:168px}
 .cfield.crowded .ctok{width:44px;padding:1px}
 .cfield.crowded .ctok .ci{font-size:16px}
@@ -160,9 +162,10 @@ button{-webkit-tap-highlight-color:transparent}
 .ccover{position:absolute;bottom:0;width:4px;height:60%;background:linear-gradient(180deg,#3A4450,#232B35);
   border-radius:2px 2px 0 0;transform:translateX(-50%);opacity:.8}
 .cline{position:absolute;left:0;right:0;top:50%;border-top:1px dashed #232B35}
-.ctok{position:absolute;transform:translateX(-50%);width:56px;padding:2px;background:transparent;
-  border:1px solid transparent;border-radius:6px;text-align:center;line-height:1.1;
-  transition:left .14s linear,top .2s ease,opacity .35s ease,transform .25s ease}
+.ctok{position:absolute;transform:translateX(-50%);width:58px;padding:3px 2px;background:rgba(10,14,20,.82);
+  border:1px solid #3A4555;border-radius:8px;text-align:center;line-height:1.1;z-index:2;
+  transition:left .14s linear,top .2s ease,opacity .35s ease,transform .25s ease;
+  box-shadow:0 2px 6px rgba(0,0,0,.45);color:var(--tx);-webkit-appearance:none;appearance:none}
 .ctok.atkfx{filter:brightness(1.22);transform:translateX(-50%) scale(1.08)}
 .ctok.hitfx{filter:brightness(1.35) saturate(.7)}
 .ctok.fx-heal-src{box-shadow:0 0 14px 4px rgba(100,220,120,.75);filter:brightness(1.25) saturate(1.2)}
@@ -3820,7 +3823,7 @@ function skillMilestone(levels){
     <button class="btn-main" onclick="closeModal();${rest.length?`setTimeout(()=>skillMilestone([${rest.join(",")}]),300);`:""}">Понял</button>`,true);
   save();
 }
-const clsName=k=>{const c=CLASSES.find(x=>x.k===k);return c?c.n:"Отсутствует";};
+const clsName=k=>{const c=CLASSES.find(x=>x.k===k);return c?c.n:"без класса";};
 function rollSkillKey(){
   const mine=myArch();
   const pool=Object.keys(SKILLS).filter(k=>!S.skills.includes(k)&&
@@ -6603,11 +6606,15 @@ function setPause(p){ CBT.paused=p; renderBattle(); }
 function endBattle(win){
   try{ if(win) bumpNoiseHere(10); else bumpNoiseHere(6); }catch(e){}
   CBT.on=false; clearInterval(CBT.timer); CBT.timer=null;
-  const hero=CBT.units.find(u=>u.hero);
+  CBT.els={}; CBT.sig=null;
+  const hero=CBT.units.find(u=>u.hero)||{hp:S.hp,en:S.en,hpMax:S.hp};
   if(tutOn()&&tutId()==="fight"&&hero.hp<=0){
-    hero.hp=Math.round(hero.hpMax*0.3); win=true;
+    hero.hp=Math.round((hero.hpMax||S.hp)*0.3); win=true;
     CBT.units.filter(u=>u.side==="e").forEach(u=>u.dead=true);
     sysmsg("Система вмешивается: тестовый носитель не может погибнуть на первой проверке. Ты жив, хоть и на пределе.");
+  }
+  if(win&&tutOn()&&tutId()==="fight"){
+    try{ tutDone("fight"); }catch(e){}
   }
   S.hp=Math.max(0,Math.round(hero.hp)); S.en=Math.round(hero.en);
   if(!S.dg&&CBT.node&&S.nodes[CBT.node.id]){
@@ -7082,9 +7089,16 @@ function flee(){
 
 /* ---------- отрисовка боя ---------- */
 function unitAvatar(u){
-  return u.side==="a"?(u.hero?avatar(S.name,"human",34):
-    (u.ally?avatar(u.n,allyKind(u.ally),34):(u.pet?avatar(u.n,"beast",34):avatar(u.n,"machine",34))))
-    :avatar(u.n,foeKind(u),34);
+  // Эмодзи всегда видно на слабых WebView; SVG — дополнение
+  const ic=u.ic||(u.side==="a"?"◇":"◈");
+  try{
+    const svg=u.side==="a"?(u.hero?avatar(S.name,"human",28):
+      (u.ally?avatar(u.n,allyKind(u.ally),28):(u.pet?avatar(u.n,"beast",28):avatar(u.n,"machine",28))))
+      :avatar(u.n,foeKind(u),28);
+    return `<span class="ci-emoji">${ic}</span><span style="display:block;margin-top:1px">${svg}</span>`;
+  }catch(e){
+    return `<span class="ci-emoji">${ic}</span>`;
+  }
 }
 function battleShell(sel){
   const skRow=sel?sel.skills.map(k=>{
@@ -7101,6 +7115,8 @@ function battleShell(sel){
     </div>
     <div class="cfield ${(CBT.crowd||0)>14?"mass":(CBT.crowd||0)>8?"crowded":""}" id="cfield"><div class="cline"></div>
     ${(CBT.cover||[]).map(c=>`<div class="ccover" style="left:${c}%"></div>`).join("")}</div>
+    <div class="ui-sec" style="margin-top:6px">Бойцы и враги (тап = выбрать / назначить цель)</div>
+    <div id="cbtStrip" class="row" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px"></div>
     <div class="ui-sec">Управление</div>
     <div class="row">
       <button class="btn-main" style="flex:1" onclick="setPause(${CBT.paused?"false":"true"})">${CBT.paused?"▶ Продолжить":"⏸ Пауза"}</button>
@@ -7128,7 +7144,7 @@ function battleShell(sel){
       <span class="nm"><b>${esc(u.n)}</b>
       <span class="mut">${Math.round(u.hp)}/${u.hpMax}${u.enMax?" · эф "+Math.round(u.en):""}</span></span></button>`).join("")}</div>
     ${sel?`<hr><div class="ui-sec">${esc(sel.n)} · цель: ${sel.tgt&&!sel.tgt.dead?esc(sel.tgt.n):"не выбрана (тап по врагу)"}</div>
-    <div class="row">${skRow||'<span class="mut">Нет боевых навыков.</span>'}</div>
+    <div class="row">${skRow||'<span class="mut">Пока нет боевых навыков (класс — с карт позже). Обычная атака оружием всё равно идёт.</span>'}</div>
     <div class="row" style="margin-top:6px">
       <button onclick="orderMove(-14)">← Назад</button>
       <button onclick="orderMove(14)">Вперёд →</button>
@@ -7162,13 +7178,22 @@ function syncTokens(){
     if(u.dead&&!CBT.els[u.id]) return;
     live[u.id]=1;
     let el=CBT.els[u.id];
-    if(!el){
+    if(!el || !el.isConnected){
       el=document.createElement("button");
+      el.type="button";
       el.className="ctok";
+      el.setAttribute("data-uid", u.id);
       el.onclick=()=>tapUnit(u.id);
-      el.innerHTML=`<span class="ci">${unitAvatar(u)}</span>
+      const ic=u.ic||"◆";
+      el.innerHTML=`<span class="ci"><span class="ci-emoji">${ic}</span></span>
         <span class="chp"><i></i></span><span class="cnm">${esc(u.n)}</span>
         <span class="crole"></span><span class="cef"></span>`;
+      // try rich avatar async-safe
+      try{
+        const rich=unitAvatar(u);
+        const ci=el.querySelector(".ci");
+        if(ci&&rich) ci.innerHTML=rich;
+      }catch(e){}
       field.appendChild(el);
       CBT.els[u.id]=el;
     }
@@ -7240,6 +7265,11 @@ function renderBattle(){
   if(CBT.sig!==sig){
     CBT.sig=sig; CBT.els={};
     $("app").innerHTML=battleShell(sel);
+    // после замены DOM — токены в следующем кадре (clientHeight уже валиден)
+    try{
+      requestAnimationFrame(()=>{ try{ syncTokens(); }catch(e){} });
+      setTimeout(()=>{ try{ syncTokens(); }catch(e){} }, 50);
+    }catch(e){}
   }
   const t=$("cbtT"); if(t) t.textContent=CBT.t.toFixed(1)+" с"+(CBT.indoor?" · тесно":"");
   const lg=$("cbtlog");
@@ -7256,6 +7286,25 @@ function renderBattle(){
     lg.innerHTML=lines.slice(0,18).map(x=>"<p>"+x+"</p>").join("");
   }
   syncTokens();
+  // запасная полоска юнитов, если поле пустое (баг WebView)
+  try{
+    const field=$("cfield");
+    const strip=$("cbtStrip");
+    if(field&&strip){
+      const nTok=field.querySelectorAll(".ctok").length;
+      if(CBT.units&&CBT.units.length){
+        strip.style.display="flex";
+        const sel=CBT.units.find(u=>u.id===CBT.sel&&!u.dead)||null;
+        strip.innerHTML=CBT.units.filter(u=>!u.dead).map(u=>{
+          const isSel=sel&&u.id===sel.id;
+          const isTgt=sel&&sel.tgt&&sel.tgt.id===u.id;
+          const sideCol=u.side==="a"?"var(--sys)":"var(--rust)";
+          const mark=isTgt?"🎯 ":isSel?"▶ ":"";
+          return `<button type="button" onclick="tapUnit('${u.id}')" style="font-size:12px;padding:6px 8px;border-color:${sideCol}">${mark}${u.ic||"◆"} ${esc(u.n)} · ${Math.max(0,u.hp|0)}/${u.hpMax|0}</button>`;
+        }).join("");
+      }
+    }
+  }catch(e){}
 }
 function setLogFilter(k){ CBT.logFilter=k; CBT._logFilt=null; renderBattle(); }
 let LAST_ACT=null;
@@ -16894,12 +16943,21 @@ function tutSkip(){
 function tutorialFight(){
   if(!tutAllow("fight")) return;
   const node=nodeById(S.at);
+  CBT._rosterOk=true; // без меню состава в обучении
   startBattle([
     {n:"Оболочка",ic:"◈",hp:16,dmg:4,def:1,lv:1,t:"rift"},
     {n:"Ползун",ic:"✻",hp:14,dmg:4,def:1,lv:1,t:"rift"},
     {n:"Огонёк",ic:"◉",hp:12,dmg:5,def:0,lv:1,t:"rift"}
   ],node);
-  clog("Система: целей трое. Тапай по очереди, назначай цель и жми «Продолжить».");
+  // пододвинуть стороны ближе — иначе мили долго бежит
+  try{
+    const allies=CBT.units.filter(u=>u.side==="a");
+    const foes=CBT.units.filter(u=>u.side==="e");
+    allies.forEach((u,i)=>{ u.x=28+i*6; u.mspd=(u.mspd||12)*1.4; });
+    foes.forEach((u,i)=>{ u.x=62+i*8; u.mspd=(u.mspd||12)*1.3; });
+  }catch(e){}
+  clog("Система: целей трое. Тапни врага на поле — назначишь цель, затем «Продолжить».");
+  try{ syncTokens(); }catch(e){}
 }
 function tutorialLoot(){
   const fixed=[];
@@ -20629,7 +20687,7 @@ function startGame(){
     <span class="mut">Первые дни Система щедрее обычного — редкие находки и особые вещи выпадают заметно чаще. Дальше всё встанет на обычные рельсы.</span></div>
     <div class="syswin"><div class="t">СТАТУС</div>
     Имя: ${esc(S.name)}<br>Уровень: 1<br>Личный ранг: Обычный<br>
-    Класс: отсутствует<br>Титулов пока нет<br>
+    Класс: пока нет (придёт с карт позже)<br>Титулов пока нет<br>
     Свободных очков характеристик: 3</div>
     <div class="mut">Начни с распределения очков — вкладка «Герой» внизу экрана.</div>
     <button class="btn-main" onclick="closeModal()">Дальше</button>`,true);
