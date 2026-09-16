@@ -2758,7 +2758,7 @@ function storeKind(){
     memory:"только текущая вкладка (после закрытия пропадёт)"}[STORE.kind];
 }
 const SLOTKEY = i=>"rift_slot_"+i;
-const SLOTN = 7;
+const SLOTN = 10;
 
 /* ---------- ОБЛАЧНОЕ СОХРАНЕНИЕ (Supabase) ----------
    Чтобы включить: впиши свои SUPABASE_URL и SUPABASE_ANON_KEY ниже.
@@ -2816,18 +2816,47 @@ async function cloudSignOut(){
   try{ await SB.auth.signOut(); }catch(e){}
   SBUSER=null;
 }
-async function cloudPush(){
+
+function slotLabelShort(d,i,src){
+  const info=slotInfo(d);
+  if(!info) return (src||"?")+" #"+(i+1)+" (пусто)";
+  return (src||"?")+" #"+(i+1)+": "+info.n+" · ур."+info.lvl+" · день "+info.day+(info.cls?" · "+info.cls:"");
+}
+function slotsToArr(obj){
+  const a=new Array(SLOTN).fill(null);
+  if(!obj) return a;
+  for(let i=0;i<SLOTN;i++){
+    const v=(obj[String(i)]!==undefined)?obj[String(i)]:obj[i];
+    if(v) a[i]=v;
+  }
+  return a;
+}
+function slotScore(d){
+  if(!d) return -1;
+  return (d.day||0)*100000+(d.lvl||0)*1000+(d.xp||0)+(d.kills||0)*10;
+}
+async function cloudFetchRemote(){
   cloudInit(); if(!SB) return {error:"Облако не настроено."};
   try{
-    // обновить сессию — иначе auth.uid() в RLS бывает null
     const {data:sess}=await SB.auth.getSession();
     SBUSER=sess&&sess.session?sess.session.user:SBUSER;
     if(!SBUSER) return {error:"Сначала войди в аккаунт."};
-    const slots={}; SLOTS.forEach((d,i)=>{ if(d) slots[i]=d; });
+    const {data,error}=await SB.from("rift_saves").select("slots").eq("user_id",SBUSER.id).maybeSingle();
+    if(error) return {error:error.message};
+    return {ok:1,slots:slotsToArr(data&&data.slots)};
+  }catch(e){ return {error:String(e)}; }
+}
+async function cloudWriteRemote(arr){
+  cloudInit(); if(!SB) return {error:"Облако не настроено."};
+  try{
+    const {data:sess}=await SB.auth.getSession();
+    SBUSER=sess&&sess.session?sess.session.user:SBUSER;
+    if(!SBUSER) return {error:"Сначала войди в аккаунт."};
+    const slots={};
+    for(let i=0;i<SLOTN;i++) if(arr[i]) slots[i]=arr[i];
     const row={user_id:SBUSER.id,slots,updated_at:new Date().toISOString()};
     let {error}=await SB.from("rift_saves").upsert(row,{onConflict:"user_id"});
     if(error&&/row level security|RLS/i.test(error.message||"")){
-      // fallback: update, затем insert
       const up=await SB.from("rift_saves").update({slots:row.slots,updated_at:row.updated_at}).eq("user_id",SBUSER.id);
       if(up.error){
         const ins=await SB.from("rift_saves").insert(row);
@@ -2837,26 +2866,169 @@ async function cloudPush(){
     if(error){
       const msg=error.message||String(error);
       if(/row level security|RLS/i.test(msg))
-        return {error:"Облако: нет права записи (RLS). В Supabase → SQL Editor выполни политики из комментария в коде (rift_saves)."};
+        return {error:"Облако: нет права записи (RLS). Проверь политики таблицы rift_saves."};
       return {error:msg};
     }
     return {ok:1};
   }catch(e){ return {error:String(e)}; }
 }
-async function cloudPull(){
-  cloudInit(); if(!SB||!SBUSER) return {error:"Сначала войди в аккаунт."};
-  try{
-    const {data,error}=await SB.from("rift_saves").select("slots").eq("user_id",SBUSER.id).maybeSingle();
-    if(error) return {error:error.message};
-    if(!data||!data.slots) return {error:"В облаке пока ничего нет — сначала сохрани."};
-    const slots=data.slots;
-    for(let i=0;i<SLOTN;i++){
-      if(slots[i]){ SLOTS[i]=slots[i]; await STORE.set(SLOTKEY(i),JSON.stringify(slots[i])); }
+function cloudMergeDraft(localArr, cloudArr){
+  const picks=new Array(SLOTN).fill(null);
+  const usedL=new Set(), usedC=new Set();
+  for(let i=0;i<SLOTN;i++){
+    const L=localArr[i], C=cloudArr[i];
+    if(L&&!C){ picks[i]={src:"local",i,data:L}; usedL.add(i); }
+    else if(C&&!L){ picks[i]={src:"cloud",i,data:C}; usedC.add(i); }
+  }
+  const free=()=>{ for(let i=0;i<SLOTN;i++) if(!picks[i]) return i; return -1; };
+  const extras=[];
+  for(let i=0;i<SLOTN;i++){
+    const L=localArr[i], C=cloudArr[i];
+    if(L&&C){
+      if(!picks[i]){ picks[i]={src:"local",i,data:L}; usedL.add(i); }
+      const j=free();
+      if(j>=0){ picks[j]={src:"cloud",i,data:C}; usedC.add(i); }
+      else extras.push({src:"cloud",i,data:C});
     }
-    return {ok:1};
-  }catch(e){ return {error:String(e)}; }
+  }
+  for(let i=0;i<SLOTN;i++){
+    if(localArr[i]&&!usedL.has(i)){
+      const j=free();
+      if(j>=0){ picks[j]={src:"local",i,data:localArr[i]}; usedL.add(i); }
+      else extras.push({src:"local",i,data:localArr[i]});
+    }
+    if(cloudArr[i]&&!usedC.has(i)){
+      const j=free();
+      if(j>=0){ picks[j]={src:"cloud",i,data:cloudArr[i]}; usedC.add(i); }
+      else extras.push({src:"cloud",i,data:cloudArr[i]});
+    }
+  }
+  return {picks,extras};
 }
-let SLOTS=[null,null,null,null,null,null,null];
+let CLOUD_MERGE=null;
+function cloudMergeOpen(mode, localArr, cloudArr){
+  const draft=cloudMergeDraft(localArr, cloudArr);
+  CLOUD_MERGE={mode, localArr, cloudArr, picks:draft.picks, extras:draft.extras};
+  cloudMergeRender();
+}
+function cloudMergeOptionsHtml(slotIdx){
+  const M=CLOUD_MERGE; if(!M) return "";
+  const cur=M.picks[slotIdx];
+  const opts=[`<option value="">— пусто —</option>`];
+  for(let i=0;i<SLOTN;i++){
+    if(M.localArr[i]){
+      const sel=cur&&cur.src==="local"&&cur.i===i?"selected":"";
+      opts.push(`<option value="local:${i}" ${sel}>${esc(slotLabelShort(M.localArr[i],i,"Локально"))}</option>`);
+    }
+  }
+  for(let i=0;i<SLOTN;i++){
+    if(M.cloudArr[i]){
+      const sel=cur&&cur.src==="cloud"&&cur.i===i?"selected":"";
+      opts.push(`<option value="cloud:${i}" ${sel}>${esc(slotLabelShort(M.cloudArr[i],i,"Облако"))}</option>`);
+    }
+  }
+  return opts.join("");
+}
+function cloudMergeRender(){
+  const M=CLOUD_MERGE; if(!M) return;
+  const title=M.mode==="push"?"Сохранение в облако — раскладка слотов":"Загрузка из облака — раскладка слотов";
+  const hint=M.mode==="push"
+    ?"Итог запишется в облако. Локальные слоты на устройстве не меняются."
+    :"Итог запишется в локальные слоты. Облако не изменится, пока не сохранишь в облако.";
+  let rows="";
+  for(let i=0;i<SLOTN;i++){
+    rows+=`<div class="item" style="cursor:default;display:block;margin-top:6px">
+      <div class="mut">Слот ${i+1}</div>
+      <select id="cms${i}" style="width:100%;margin-top:4px;padding:8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px"
+        onchange="cloudMergePick(${i},this.value)">${cloudMergeOptionsHtml(i)}</select>
+    </div>`;
+  }
+  const extras=M.extras.length
+    ?`<div class="syswin" style="margin-top:8px;border-color:var(--warn)"><div class="t" style="color:var(--warn)">Не влезло в ${SLOTN} слотов</div>
+      ${M.extras.map(e=>`<div class="mut">${esc(slotLabelShort(e.data,e.i,e.src==="local"?"Локально":"Облако"))}</div>`).join("")}
+      <div class="mut" style="margin-top:4px">Назначь их в свободный слот выше или замени один из занятых. Иначе при подтверждении они отбросятся.</div></div>`
+    :"";
+  openModal(`<h3>${title}</h3>
+    <div class="mut">${hint}</div>
+    <div class="mut" style="margin-top:4px">Можно просто сменить номер слота — сохранение то же. Если и локально, и в облаке занят один номер, авто-раскладка разносит их по свободным.</div>
+    ${rows}${extras}
+    <div class="row" style="margin-top:10px">
+      <button class="btn-main" onclick="cloudMergeConfirm()">Подтвердить</button>
+      <button onclick="cloudMergeAuto()">Авто-раскладка</button>
+      <button onclick="closeModal();CLOUD_MERGE=null">Отмена</button>
+    </div>`,true);
+}
+function cloudMergePick(slotIdx,val){
+  const M=CLOUD_MERGE; if(!M) return;
+  if(!val){ M.picks[slotIdx]=null; cloudMergeRender(); return; }
+  const [src,is]=val.split(":");
+  const i=+is;
+  const data=src==="local"?M.localArr[i]:M.cloudArr[i];
+  for(let j=0;j<SLOTN;j++){
+    const p=M.picks[j];
+    if(p&&p.src===src&&p.i===i) M.picks[j]=null;
+  }
+  M.picks[slotIdx]={src,i,data};
+  const used=new Set(M.picks.filter(Boolean).map(p=>p.src+":"+p.i));
+  M.extras=[];
+  for(let i2=0;i2<SLOTN;i2++){
+    if(M.localArr[i2]&&!used.has("local:"+i2)) M.extras.push({src:"local",i:i2,data:M.localArr[i2]});
+    if(M.cloudArr[i2]&&!used.has("cloud:"+i2)) M.extras.push({src:"cloud",i:i2,data:M.cloudArr[i2]});
+  }
+  cloudMergeRender();
+}
+function cloudMergeAuto(){
+  const M=CLOUD_MERGE; if(!M) return;
+  const d=cloudMergeDraft(M.localArr,M.cloudArr);
+  M.picks=d.picks; M.extras=d.extras;
+  cloudMergeRender();
+}
+async function cloudMergeConfirm(){
+  const M=CLOUD_MERGE; if(!M) return;
+  const arr=new Array(SLOTN).fill(null);
+  const seen=new Set();
+  for(let i=0;i<SLOTN;i++){
+    const p=M.picks[i];
+    if(!p||!p.data) continue;
+    const key=p.src+":"+p.i;
+    if(seen.has(key)) continue;
+    seen.add(key);
+    arr[i]=p.data;
+  }
+  if(M.mode==="push"){
+    toast("Сохраняю в облако…");
+    const r=await cloudWriteRemote(arr);
+    if(r.error) return toast2(r.error);
+    CLOUD_MERGE=null; closeModal();
+    sysmsg("Облако: сохранено слотов "+arr.filter(Boolean).length+" из "+SLOTN+".");
+    toast("Облако сохранено");
+    return;
+  }
+  toast("Записываю локально…");
+  for(let i=0;i<SLOTN;i++){
+    SLOTS[i]=arr[i]||null;
+    if(arr[i]) await STORE.set(SLOTKEY(i),JSON.stringify(arr[i]));
+    else try{ await STORE.delete(SLOTKEY(i)); }catch(e){}
+  }
+  if(typeof CURSLOT==="number"&&SLOTS[CURSLOT]){ S=SLOTS[CURSLOT]; try{fixSave(); }catch(e){} }
+  CLOUD_MERGE=null; closeModal();
+  sysmsg("Локально: занято слотов "+arr.filter(Boolean).length+" из "+SLOTN+".");
+  toast("Локальные слоты обновлены");
+  try{ saveBox(); }catch(e){}
+  try{ render(); }catch(e){}
+}
+async function cloudPush(){
+  return cloudWriteRemote(SLOTS.slice(0,SLOTN));
+}
+async function cloudPull(){
+  const r=await cloudFetchRemote();
+  if(r.error) return r;
+  if(!r.slots.some(Boolean)) return {error:"В облаке пока ничего нет — сначала сохрани."};
+  cloudMergeOpen("pull", SLOTS.slice(0,SLOTN), r.slots);
+  return {ok:1,ui:1};
+}
+
+let SLOTS=[null,null,null,null,null,null,null,null,null,null];
 let CURSLOT=0;
 
 const WORLDS=[
@@ -4460,7 +4632,7 @@ const TITLE_HOWTO={
   juggernaut:{track:"Бои с >70% HP",val:s=>((s.stat&&s.stat.jugger)||0)},
   berserk:{track:"Добивания на низком HP",val:s=>((s.stat&&s.stat.berserk)||0)},
   masochist:{track:"Выходы с 1 HP",val:s=>((s.stat&&s.stat.masochist)||0)},
-  hamster:{track:"Ступень «Хомяка» (редкий хлам у себя)",val:s=>hamsterTier(s)},
+  hamster:{track:"Вещи эпик+ (инвентарь, склад, экипировка). 1: ≥5 эпик/≥1 легенда; 2: ≥10 эпик/≥3 легенда/≥1 миф+; 3: ≥20 эпик/≥8 легенда/≥3 миф/≥2 древн.+",val:s=>hamsterTier(s)},
   overcomer:{track:"Победы над более сильными",val:s=>((s.stat&&s.stat.overcomer)||0)},
   host:{track:"Питомцы",val:s=>((s.pets||[]).length)},
   commander:{track:"Боевые спутники + наёмники",val:s=>((s.party||[]).filter(p=>!p.civ&&!p.away).length)+((s.company||[]).length)},
@@ -4473,21 +4645,41 @@ function titleDetail(t){
   const info=TITLE_HOWTO[t];
   const cur=info?info.val(S):0;
   const next=tiers&&tiers[lv];
-  openModal(`<h3 class="r5">${esc(T.n)}${lv>1?" · ступень "+lv:""}</h3>
+  let prog="";
+  if(info){
+    prog=`<div class="mut" style="margin-top:8px">Как получают: <b>${esc(info.track)}</b></div>`;
+    if(t==="hamster"&&typeof hamsterCounts==="function"){
+      const c=hamsterCounts(S);
+      prog+=`<div class="mut" style="margin-top:4px">Сейчас: эпик+ <b>${c.n3}</b> · легенда+ <b>${c.n4}</b> · миф+ <b>${c.n5}</b> · древн.+ <b>${c.n6}</b> · небес. <b>${c.n7}</b></div>`;
+    }
+    if(next!==undefined) prog+=`<div class="mut" style="margin-top:4px">Прогресс: <b>${cur}</b> / нужно <b>${next}</b> для ступени ${lv+1}</div>`;
+    else prog+=`<div class="mut" style="margin-top:4px">Сейчас: <b>${cur}</b> · предел ступеней</div>`;
+  }
+  openModal(`<h3 class="r5">${esc(T.n)}${lv?` · ступень ${lv}`:""}</h3>
     <div class="mut">${esc(T.d)}${lv>1?" (эффект умножен на "+lv+")":""}</div>
-    ${info?`<div class="mut" style="margin-top:8px">Как получают: <b>${esc(info.track)}</b>.
-      Сейчас: ${cur}${next!==undefined?` · до следующей ступени: ${next}`:" · дальше ступеней нет — предел достигнут"}</div>`:""}
+    ${prog}
     ${tiers?`<div class="mut" style="margin-top:6px">Пороги ступеней: ${tiers.join(" / ")}</div>`:""}`);
 }
-function hamsterTier(s){
-  // ступень по числу предметов высокого ранга в инвентаре + личном складе
+function hamsterPool(s){
   const pool=(s.inv||[]).concat(s.stash||[]);
-  const n3=pool.filter(it=>it&&(it.r||0)>=3).length;
-  const n4=pool.filter(it=>it&&(it.r||0)>=4).length;
-  const n5=pool.filter(it=>it&&(it.r||0)>=5).length;
-  if(n5>=3||n4>=8||n3>=20) return 3;
-  if(n4>=3||n3>=10) return 2;
-  if(n3>=5||n4>=1) return 1;
+  Object.values(s.eq||{}).forEach(it=>{ if(it&&it.base) pool.push(it); });
+  return pool;
+}
+function hamsterCounts(s){
+  const pool=hamsterPool(s);
+  return {
+    n3:pool.filter(it=>it&&(it.r||0)>=3).length,
+    n4:pool.filter(it=>it&&(it.r||0)>=4).length,
+    n5:pool.filter(it=>it&&(it.r||0)>=5).length,
+    n6:pool.filter(it=>it&&(it.r||0)>=6).length,
+    n7:pool.filter(it=>it&&(it.r||0)>=7).length
+  };
+}
+function hamsterTier(s){
+  const {n3,n4,n5,n6,n7}=hamsterCounts(s);
+  if(n7>=2||n6>=3||n5>=3||n4>=8||n3>=20) return 3;
+  if(n6>=1||n5>=1||n4>=3||n3>=10) return 2;
+  if(n4>=1||n3>=5) return 1;
   return 0;
 }
 function typeKillBonus(ft, foe){
@@ -16377,7 +16569,7 @@ function saveBox(){
           <button onclick="cloudLoadNow()">⬇ Загрузить из облака</button>
         </div>
         <button style="margin-top:6px;width:100%" onclick="cloudLogoutNow()">Выйти из аккаунта</button>`
-      :`<div class="mut" style="font-size:12px">Аккаунт по почте — бесплатно, прогресс будет виден с любого устройства.</div>
+      :`<div class="mut" style="font-size:12px">Аккаунт по почте. При сохранении/загрузке сам выбираешь раскладку слотов (до 10). Локально и облако можно разнести по разным номерам.</div>
         <input id="cloudEmail" type="email" placeholder="почта" style="width:100%;margin-top:6px;padding:8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
         <input id="cloudPass" type="password" placeholder="пароль (от 6 символов)" style="width:100%;margin-top:6px;padding:8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
         <div class="row" style="margin-top:6px">
@@ -16428,18 +16620,18 @@ async function cloudLoginNow(){
 }
 async function cloudLogoutNow(){ await cloudSignOut(); saveBox(); }
 async function cloudSaveNow(){
-  toast("Сохраняю в облако…");
-  const r=await cloudPush();
+  const r=await cloudFetchRemote();
   if(r.error) return toast2(r.error);
-  sysmsg("Все слоты сохранены в облаке.");
+  cloudMergeOpen("push", SLOTS.slice(0,SLOTN), r.slots||slotsToArr(null));
 }
+
 async function cloudLoadNow(){
-  toast("Загружаю из облака…");
-  const r=await cloudPull();
+  const r=await cloudFetchRemote();
   if(r.error) return toast2(r.error);
-  sysmsg("Слоты обновлены из облака. Открой «Сохранения», чтобы выбрать носителя.");
-  saveBox();
+  if(!r.slots.some(Boolean)) return toast2("В облаке пока ничего нет — сначала сохрани.");
+  cloudMergeOpen("pull", SLOTS.slice(0,SLOTN), r.slots);
 }
+
 function exportSaveFile(){
   try{
     const data=JSON.stringify(S);
