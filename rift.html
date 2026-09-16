@@ -960,13 +960,13 @@ const TITLES = {
   skill_brake:{n:"Способный Тормоз",d:"Чем позже взял первую способность (10 / 20 / 30 ур.), тем сильнее все умения.",e:{skPow:.08}},
   class_brake:{n:"Классовый Тормоз",d:"Чем позже взял первый класс (15 / 25 / 35 ур.), тем глубже впитывается школа класса.",e:{clsPow:.08}},
 
-  juggernaut:{n:"Джаггернаут",d:"+HP за ступень. Часто заканчиваешь бой с большим запасом здоровья.",e:{hp:10}},
-  berserk:{n:"Берсерк",d:"+урон за ступень. Добивания, пока сам на низком HP.",e:{dmg:.08}},
-  masochist:{n:"Мазохист",d:"+защита, когда HP низкие. Не раз уходил с 1 HP.",e:{def:.06}},
-  hamster:{n:"Хомяк",d:"Меньше износ снаряжения и больше переносимого веса. Держишь много вещей высокого ранга.",e:{dur:1,carry:12}},
-  overcomer:{n:"Превозмогатель",d:"+урон против более сильных по уровню.",e:{dmg:.07}},
-  host:{n:"Хозяин",d:"+к силе питомцев. Пороги по числу питомцев.",e:{pet:0.06}},
-  commander:{n:"Командир",d:"+к силе отряда и наёмников. Пороги по числу своих.",e:{ally:0.05}},
+  juggernaut:{n:"Джаггернаут",d:"+10 макс. HP за ступень. Часто заканчиваешь бой с большим запасом здоровья.",e:{hp:10}},
+  berserk:{n:"Берсерк",d:"+8% урона за ступень. Добивания, пока сам на низком HP.",e:{dmg:.08}},
+  masochist:{n:"Мазохист",d:"+6% защиты за ступень (действует постоянно). Не раз уходил с 1 HP.",e:{def:.06}},
+  hamster:{n:"Хомяк",d:"Вдвое медленнее износ снаряжения, +12 к переносимому весу за ступень. Держишь много вещей высокого ранга.",e:{dur:1,carry:12}},
+  overcomer:{n:"Превозмогатель",d:"+7% урона за ступень против более сильных по уровню.",e:{dmg:.07}},
+  host:{n:"Хозяин",d:"+6% к силе питомцев за ступень. Пороги по числу питомцев.",e:{pet:0.06}},
+  commander:{n:"Командир",d:"+5% к силе отряда и наёмников за ступень. Пороги по числу своих.",e:{ally:0.05}},
   bossbane:{n:"Убийца имеющих имя",d:"Больше опыта и лута с боссов и именованных. 1 / 10 / 100.",e:{}},
   elitebane:{n:"Охотник на элиту",d:"Больше опыта и лута с элитных. 1 / 10 / 100.",e:{}}
 };
@@ -2071,10 +2071,28 @@ function mapNotePrompt(id){
       <button onclick="mapNoteSet('${id}','');closeModal()">Снять</button>
     </div>`);
 }
+function blackGearPrice(it){
+  return Math.round((60+itemScore(it)*7)*1.25);
+}
+function blackGearStock(){
+  if(S.bmDay!==S.day||!(S.bmStock||[]).length){
+    S.bmDay=S.day;
+    const n=3, items=[];
+    for(let i=0;i<n;i++){
+      const pool=ITEMBASE.filter(b=>b.lv<=S.lvl+5);
+      const base=pool.length?pick(pool):null; if(!base) continue;
+      const it=mkItem(base,rollRarity(1.5),S.lvl+rnd(1,3));
+      items.push(it);
+    }
+    S.bmStock=items;
+  }
+  return S.bmStock||[];
+}
 function blackMarket(fromTemp){
   const heat=S.wanted&&S.wanted.heat||0;
   const mult=1.15+(heat>30?0.1:0);
   const goods=[["stimpack",8],["grenade",10],["emp",14],["essence",16],["oblivion",45],["spark",22],["fuel",7],["parts",9]];
+  const gearList=blackGearStock();
   openModal(`<h3>🕶 Чёрный рынок</h3>
     <div class="mut">${fromTemp?"Временные палатки. ":"Тихий угол. "}Без документов, с наценкой. Шум и розыск здесь не любят — но запоминают лица.</div>
     <div class="mut">💠 ${S.tok}</div>
@@ -2082,6 +2100,15 @@ function blackMarket(fromTemp){
       const pr=Math.round(p*mult);
       return `<button onclick="buyBlack('${id}',${pr})">${USABLE[id]?USABLE[id].ic:""} ${USABLE[id]?USABLE[id].n:id}<br><span class="mut">${pr} 💠</span></button>`;
     }).join("")}</div>
+    <hr><h3>Снаряжение из-под полы</h3>
+    <div class="mut" style="font-size:12px">Дороже, чем у торговца, зато привоз получше — реже приносят обычный хлам.</div>
+    <div class="row" style="flex-wrap:wrap;margin-top:4px">${gearList.length?gearList.map((it,i)=>{
+      const pr=Math.round(blackGearPrice(it)*mult);
+      return `<button class="item ${rbd(it)}" style="width:100%" onclick="buyBlackGear(${i})">
+        <span class="ic">${it.ic}</span><span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b>
+        <span class="mut">${rname(it)} · ур.${it.lvl}</span></span>
+        <span class="r5" style="flex:none">${pr} 💠</span></button>`;
+    }).join(""):'<div class="mut">Сегодня нечего предложить — загляни завтра.</div>'}</div>
     <button style="margin-top:8px" onclick="closeModal()">Уйти</button>`);
 }
 function buyBlack(id,p){
@@ -2090,6 +2117,19 @@ function buyBlack(id,p){
   if(S.wanted) S.wanted.heat=Math.min(100,(S.wanted.heat||0)+2);
   sysmsg("Куплено на чёрном рынке: "+(USABLE[id]?USABLE[id].n:id)+".");
   noteDecision("Купил на чёрном рынке: "+(USABLE[id]?USABLE[id].n:id)+".");
+  save(); blackMarket();
+}
+function buyBlackGear(idx){
+  const list=blackGearStock(); const it=list[idx]; if(!it) return;
+  const heat=S.wanted&&S.wanted.heat||0, mult=1.15+(heat>30?0.1:0);
+  const p=Math.round(blackGearPrice(it)*mult);
+  if(S.tok<p) return toast2("Не хватает кристаллов.");
+  S.tok-=p; S.inv.push(it); S.found++;
+  S.bmStock=list.filter((_,i)=>i!==idx);
+  bumpNoiseHere(5);
+  if(S.wanted) S.wanted.heat=Math.min(100,(S.wanted.heat||0)+3);
+  sysmsg("Куплено на чёрном рынке: "+it.n+".");
+  noteDecision("Купил на чёрном рынке снаряжение: "+it.n+".");
   save(); blackMarket();
 }
 function petMissionMenu(i){
@@ -2352,7 +2392,7 @@ const TRAITS={
   radioman:{civ:1,n:"Радист",d:"+10% к торговле (покупки дешевле, продажи дороже) и +10% к добыче/материалам (как у фуражира, слабее). Чуть выше шанс ранга лута.",e:{trade:.1,loot:.1}},
   wrangler:{n:"Погонщик",d:"Твари слушаются жеста. Питомцы отряда крепче на 25% — он кормит и рычит на них одинаково убедительно.",e:{pet:.25}},
   scribe:{civ:1,n:"Писарь",d:"Ведёт записи, даже когда не просят. Ты получаешь на 15% больше опыта — разбор полётов после боя не бывает лишним.",e:{hxp:.15}},
-  keeper:{civ:1,n:"Кладовщик",d:"+25 переносимого веса, еда расходуется на 15% медленнее (на воду не влияет). Суммируется с другими такими же специалистами, но не больше 40% экономии еды суммарно.",e:{carry:25,food:.15}},
+  keeper:{civ:1,n:"Кладовщик",d:"+25 переносимого веса, еда расходуется на 15% медленнее (на воду не влияет). Суммируется с другими такими же специалистами, но не больше 50% экономии еды суммарно.",e:{carry:25,food:.15}},
   athletic:{n:"Атлет",d:"Восстановление сил вне боя сильнее на 50%. Идёт дальше остальных и меньше ноет.",e:{stamregen:.5}},
   scavenger2:{civ:1,n:"Следопыт-сборщик",d:"Обыск и поиск воды/еды стоят на 20% меньше сил. Ходит по району так, будто уже здесь жил.",e:{stamsave:.2}}
 };
@@ -2366,7 +2406,7 @@ function partyTrait(k){
     const t2=TRAITS[p.trait2]; if(t2&&t2.e[k]) v+=t2.e[k]*hm; });
   return v;
 }
-const CAPPED_TRAITS={food:{cap:0.4,n:"экономии еды"},water:{cap:0.4,n:"экономии воды"},
+const CAPPED_TRAITS={food:{cap:0.5,n:"экономии еды"},water:{cap:0.5,n:"экономии воды"},
   heal:{cap:0.5,n:"лечения после боя"},dmg:{cap:0.5,n:"бонуса к урону"},dmgBeast:{cap:0.6,n:"бонуса к урону по тварям"},loot:{cap:0.6,n:"бонуса к добыче"},
   travel:{cap:0.5,n:"скидки на переходы"},build:{cap:0.5,n:"скидки на постройки"},trade:{cap:0.4,n:"торговой скидки"},
   turret:{cap:0.6,n:"крепости турелей"},pet:{cap:0.6,n:"силы питомцев"},hxp:{cap:0.6,n:"бонуса опыта"},xp:{cap:0.8,n:"опыта отряду"},
@@ -2513,7 +2553,7 @@ function traitEffectFmt(k,v){
   if(k==="def"||k==="carry"||k==="warn") return (v>=0?"+":"")+Math.round(v);
   return Math.round(v*100)+"%";
 }
-function partyTraitsPanel(){
+function partyTraitsPanel(forceOpen){
   const people=(S.party||[]).filter(p=>!p.away);
   if(!people.length) return `<div class="panel"><h3>Пассивки отряда</h3><div class="mut">Пока никого нет — бонусы появятся после найма спутников.</div></div>`;
   const keys=new Set();
@@ -2799,8 +2839,13 @@ function cloudInit(){
 }
 async function cloudSignUp(email,pass){
   cloudInit(); if(!SB) return {error:"Облако не настроено."};
-  const {data,error}=await SB.auth.signUp({email,password:pass});
-  if(error) return {error:error.message};
+  const {data,error}=await SB.auth.signUp({email,password:pass,options:{emailRedirectTo:undefined}});
+  if(error){
+    const msg=error.message||"";
+    if(/rate limit|email rate/i.test(msg))
+      return {error:"Лимит писем Supabase. Включи вход без подтверждения почты: Authentication → Providers → Email → выключи Confirm email. Подожди час или войди, если аккаунт уже создан."};
+    return {error:msg};
+  }
   SBUSER=data&&data.user?data.user:null;
   return {ok:1,needsConfirm:!data.session};
 }
@@ -3436,9 +3481,19 @@ function mkItem(base,rk,lvl){
   it.sock=rk>=6?3:rk>=4?2:rk>=2?1:0; it.gems=[];
   if(base.sp) it.sp=base.sp;
   if(base.ty) it.ty=base.ty;
+  const affixOk=(m)=>{
+    const soft=/балет|каблук|туфл|flat|heel|плать|юбк|блуз|балетк|мокасин|лоафер|dress|skirt|blouse/i.test((base.n||"")+" "+(base.id||""));
+    const heavy=/Армейск|Штурмов|Осадн|Литое|Клёпан|Тяжёл|Раскалён|Зазубрен|Костяное|Гнутое|Двойное/i.test(m.n||"");
+    const work=/кузнеца|мясника|бастиона|громовержца|осад/i.test(m.n||"");
+    if(soft&&(heavy||work)) return false;
+    return true;
+  };
   const names=[];
   for(let i=0;i<R.af;i++){
-    const src=i%2===0?PREFIX:SUFFIX, m=pick(src);
+    const src=i%2===0?PREFIX:SUFFIX;
+    let m=null, tries=0;
+    while(tries++<12){ m=pick(src); if(affixOk(m)) break; }
+    if(!m||!affixOk(m)) continue;
     for(const k in m.st) it.st[k]=(it.st[k]||0)+Math.round(m.st[k]*(1+rk*0.28));
     if(names.length<2) names.push({pre:i%2===0,n:m.n});
   }
@@ -3469,10 +3524,30 @@ function addUse(s,id,n){
   if(s===S||s===window.S) try{ codexItemNote({use:id,n:USABLE[id].n,ic:USABLE[id].ic,q:n,mat:USABLE[id].mat}); }catch(err){}
 }
 function itemWeight(i){
-  if(i.gem) return 0.2;
-  if(i.use) return 0.15;
-  const heavy={wpn:1.6,body:1.8,head:0.8,legs:1.0,feet:0.8,hands:0.6,neck:0.2,ring:0.1,art:0.5,bag:1.2};
-  return Math.round(((heavy[i.s]||1)*(2+(i.r>0?i.r*0.4:0.8)))*10)/10;
+  if(!i) return 0;
+  if(i.gem) return 0.05;
+  if(i.use) return 0.12;
+  const id=i.base||i.id||"";
+  // кг, примерно как в жизни (нож ~150 г, а не 4.5 кг)
+  const byId={
+    knife:0.15,shiv:0.08,axe:1.1,bat:0.9,machete:0.7,sledge:4.5,wrench:0.55,wrenchsm:0.25,wrenchbig:1.2,
+    bow:0.6,pistol:0.85,ak:3.4,rifle:3.6,shotgun:3.2,smg:2.8,lmg:7.5,revolver:1.0,crossbow:2.2,
+    pipe:1.8,crowbar:1.4,spear:2.0,katana:1.1,staff:0.9,focus:0.3,knuckle:0.25,flail:2.5,halberd:2.8,
+    scythe:2.2,chainsaw:5.5,nailgun:2.0,launcher:3.5,orb:0.4,censer:0.6,wand:0.35,prismw:0.5,
+    nail:0.05,stick:0.8,broom:0.6,bottle:0.35,umbrella:0.4,ruler:0.2,frypan:1.0,hookstick:0.9,
+    tee_m:0.2,tee_f:0.18,shirt_m:0.25,blouse_f:0.2,hoodie_m:0.45,cardigan_f:0.4,dress_f:0.35,
+    jeans_m:0.55,jeans_f:0.5,chinos_m:0.45,skirt_f:0.25,leggings_f:0.2,sneakers_m:0.55,sneakers_f:0.5,
+    flats_f:0.25,heels_f:0.35,loafers_m:0.45,boots:0.9,boots2:0.85,boots3:1.1,bootswork:1.0,
+    jacket:1.1,raincoat:0.7,bikerjacket:1.3,platecar:4.5,platedvest:3.5,beanie:0.1,cap_m:0.12,
+    bag:0.4,bag3:1.2,bag4:0.6
+  };
+  if(byId[id]!=null){
+    const w=byId[id]*(1+Math.min(0.35,(i.r||0)*0.04));
+    return Math.round(w*100)/100;
+  }
+  const slot={wpn:0.9,body:1.0,head:0.4,legs:0.55,feet:0.6,hands:0.15,neck:0.05,ring:0.02,art:0.25,bag:0.7};
+  const w=(slot[i.s]||0.4)*(1+Math.min(0.4,(i.r||0)*0.05));
+  return Math.round(w*100)/100;
 }
 function invWeight(s){
   return s.inv.reduce((t,i)=>t+(i.use?(i.q*0.15):(i.gem?0.2:itemWeight(i))),0);
@@ -3491,7 +3566,7 @@ function passTime(h){
     if(S.torch&&!isNight()){ S.torch=false; sysmsg("Рассвет. Факел гаснет — днём он только выдаёт тебя."); }
     S.noise=clamp((S.noise||0)-(isSafe(S.at)?7:3),0,100);
     const fr=((S.org==="far")?0.7:1)*(wIs("frost")?1.4:1)*(hasUq("u_ration")?0.5:1)
-      *(1-Math.min(0.4,partyTrait("food")))*(1+combatParty().length*0.12);
+      *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12);
     S.food=clamp(S.food-1.1*fr,0,100);
     if(S.pets&&S.pets.length){
       S.pets.forEach(p=>{ p.hunger=Math.max(0,(p.hunger===undefined?100:p.hunger)-1.5); });
@@ -3500,7 +3575,7 @@ function passTime(h){
       sysmsg("Голодно. На карте есть «Искать воду» и «Искать еду» — они дают немного, но всегда. "
         +"В поселении можно поработать за паёк, а в квартирах и магазинах почти всегда есть чем поживиться."
         +(combatParty().length?" С тобой идут люди — они тоже едят, так что расход больше твоего личного.":"")); }
-    S.water=clamp(S.water-1.6*(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.4,partyTrait("water")))*(1+combatParty().length*0.1)*(typeof dayModWaterMult==="function"?dayModWaterMult():1),0,100);
+    S.water=clamp(S.water-1.6*(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1)*(typeof dayModWaterMult==="function"?dayModWaterMult():1),0,100);
     combatParty().forEach(p=>{ p.fatigue=Math.min(100,(p.fatigue||0)+0.5); });
     if(wIs("rain")&&Math.random()<0.15) S.water=clamp(S.water+2,0,100);
     if(S.food<=0||S.water<=0){ S.hp=clamp(S.hp-3,0,9999);
@@ -4197,6 +4272,7 @@ function cardDetail(i){
     ${cardAbsorbPreview(c)}
     <div class="row" style="margin-top:10px">
       <button class="btn-main" ${locked?"disabled":""} onclick="absorbCard(${i})">Поглотить</button>
+      <button onclick="skipAbsorbCard(${i})">Не поглощать</button>
       ${!isClass?`<button onclick="giveCardMenu(${i})">Отдать спутнику</button>`:""}
       ${isSafe(S.at)?`<button onclick="sellCard(${i})">Продать (${cardSellPrice(c)} 💠)</button>`:""}
       <button onclick="exportCard(${i})">Экспорт</button>
@@ -4224,6 +4300,11 @@ function giveCardMenu(i){
         p.skills.includes(c.k)?" · уже умеет":""}</span></span></button>`).join("")}`);
 }
 let LAST_ABSORB=null;
+function skipAbsorbCard(i){
+  closeModal();
+  if(typeof tutId==="function"&&tutId()==="class"){ try{ tutDone("class"); }catch(e){} }
+  toast("Карта осталась — поглотить можно позже во вкладке «Система».");
+}
 function absorbCard(i){
   const c=S.cards[i]; if(!c) return;
   // snapshot for same-day undo (1 oblivion)
@@ -5561,7 +5642,7 @@ const hasEff=(u,k)=>u.eff.some(e=>e.k===k);
 const effSum=(u,k)=>u.eff.filter(e=>e.k===k).reduce((s,e)=>s+e.v,0);
 
 function mkUnit(o){
-  return Object.assign({x:0,hp:1,hpMax:1,dmg:1,def:0,acc:70,dodge:6,rng:9,aspd:1,
+  return Object.assign({x:0,y:50,hp:1,hpMax:1,dmg:1,def:0,acc:70,dodge:6,rng:9,aspd:1,
     mspd:12,en:0,enMax:0,regen:2,skills:[],cds:{},eff:[],atk:0,tgt:null,order:null,
     auto:true,stance:"bal",dead:false,ic:"◇"},o);
 }
@@ -5840,6 +5921,7 @@ function allyGearDelta(i,cur){
 function allyGear(pi,slot,onlyBetter){
   const p=S.party[pi]; if(!p) return; allyInit(p);
   let list=S.inv.filter(i=>!i.use&&!i.gem&&!i.trinket&&(!slot||i.s===slot||(slot==="wpn2"&&i.s==="wpn")));
+  list=list.filter(i=>!wearBlockReason(i,p)); // пол и требования
   const curOf=i=>p.eq[slot||i.s];
   if(onlyBetter) list=list.filter(i=>{ const cur=curOf(i); return !cur||itemScore(i)>itemScore(cur); });
   list=list.slice().sort((a,b)=>{
@@ -5991,12 +6073,13 @@ function startBattle(foes,node){
   }
   CBT._rosterOk=false;
   applyOpt();
-  CBT.els={}; CBT.fx=[]; CBT.sig=null; CBT.logLen=-1; CBT.dmgBy={};
+  CBT.els={}; CBT.fx=[]; CBT.sig=null; CBT.logLen=-1; CBT.dmgBy={}; CBT._mdirs=null;
   CBT.on=true; CBT.paused=true; CBT.t=0; CBT.itemCd=0; CBT.debtUsed=false; CBT.swUsed=false; CBT.cradleUsed=false;
   CBT.chainT=null; CBT.chainN=0; CBT.log=[]; CBT.node=node; CBT.sel="hero";
   CBT.units=buildAllies().concat(buildFoes(foes));
   CBT.crowd=CBT.units.length;
   CBT._stripForce=true; CBT._stripT=null; CBT._silent=false;
+  CBT.units.forEach(u=>{ try{ if(!u.tgt) u.tgt=pickTarget(u); }catch(e){} });
   CBT.autopauseDone={};
   if(hasUq("u_horn")) CBT.units.filter(u=>u.side==="a").forEach(u=>u.eff.push({k:"dmg",v:.25,t:10}));
   if(hasUq("u_axe")) CBT.clock=1;
@@ -6122,6 +6205,13 @@ function dealDmg(a,b,mult,opt){
   if(a.hero&&(opt.k==="aoe"||opt.k==="dotaoe")) base*=1+petPerk("aoeDmg")*2;
   // тяжёлое небо: твари Разлома бьют больнее
   if(!a.hero&&!a.ally&&!a.pet&&a.ft==="rift"&&typeof dayModRiftDmgMult==="function") base*=dayModRiftDmgMult();
+  // артефакты Врат: Осколок Глубины (+урон), Кольцо Одинокого следа (+урон за соло-стек)
+  if(a.side==="a"&&S.dg){
+    const gd=gateArtBonus("gateDmg"); if(gd) base*=1+gd;
+    if(gateArtBonus("gateSolo")&&(S.dg.solo||S.dg.fightSolo)){
+      base*=1+Math.min(5,S.soloGateStreak||0)*0.03;
+    }
+  }
   let bdef=b.def*(1+effSum(b,"def"));
   if((CBT.cover||[]).some(c=>Math.abs(c-b.x)<6)&&opt.k!=="aoe"&&opt.k!=="dotaoe"){
     bdef+=bdef*0.4+10;
@@ -6136,6 +6226,11 @@ function dealDmg(a,b,mult,opt){
   if((a.hero||a.ally)&&b.ft==="beast") base*=(1+Math.min(0.6,partyTrait("dmgBeast")))*(a.hero&&hasUq("u_huntertrophy")?1.3:1);
   let dm=Math.max(1,Math.round(base));
   if(a.hero&&CBT.chalk&&!CBT.chalk[b.id]){ CBT.chalk[b.id]=1; crit=true; } if(crit) dm=Math.round(dm*1.8);
+  // Тихий колокол: −урон по своим во Вратах
+  if(b.side==="a"&&S.dg){
+    const gdf=gateArtBonus("gateDef");
+    if(gdf) dm=Math.max(1,Math.round(dm*(1-Math.min(0.6,gdf))));
+  }
   if(b.shield>0){ const ab=Math.min(b.shield,dm); b.shield-=ab; dm-=ab;
     clog(`Барьер ${b.n} поглощает ${ab}.`); if(dm<=0) return 0; }
   b.hp-=dm;
@@ -6736,6 +6831,42 @@ function foeSkill(u,t,dt){
   }
   return false;
 }
+function meleeSlots(targetSide){
+  // сколько бойцов противоположной стороны могут одновременно держать место у одной цели —
+  // растёт вместе с толпой: сначала только "в лоб", потом сверху/снизу, потом уже и в обход
+  const atkSide=targetSide==="a"?"e":"a";
+  const n=alive(atkSide).length;
+  return n>9?6:n>6?5:n>4?4:n>2?3:n>1?2:1;
+}
+function meleeDirs(){
+  // направления вокруг цели: прямо, сверху/снизу (ближе и дальше), и обход со спины.
+  // разброс по высоте случайный, но фиксируется один раз на весь бой — в каждой стычке
+  // "проходы" получаются разного размера, а не идеально ровной сеткой
+  if(!CBT._mdirs){
+    const base=[
+      {m:0,    flank:false}, // прямо
+      {m:-1,   flank:false}, // сверху
+      {m:1,    flank:false}, // снизу
+      {m:-1.8, flank:false}, // ещё выше
+      {m:0,    flank:true}, // заходит со спины/с неудобной стороны
+      {m:1.8,  flank:false}  // ещё ниже
+    ];
+    CBT._mdirs=base.map(d=>({dy:d.m*(15+Math.random()*15),flank:d.flank}));
+  }
+  return CBT._mdirs;
+}
+function meleeQueueRank(u,t){
+  // место юнита u в очереди на цель t среди своих же (0 = уже держит место у цели)
+  if(!t) return 0;
+  let rank=0;
+  const ug=Math.abs(t.x-u.x);
+  CBT.units.forEach(o=>{
+    if(o===u||o.dead||o.side!==u.side||o.tgt!==t) return;
+    const og=Math.abs(t.x-o.x);
+    if(og<ug-0.05||(Math.abs(og-ug)<=0.05&&(o._laneI||0)<(u._laneI||0))) rank++;
+  });
+  return rank;
+}
 function act(u){
   const dt=0.1*CBT.spd;
   if(u.order&&u.order.t==="move"){
@@ -6766,16 +6897,34 @@ function act(u){
     return;
   }
   const ai=u.side==="e"?aiOf(u):null;
-  let want=0;
+  const slots=meleeSlots(t.side);
+  const rank=meleeQueueRank(u,t);
+  const dirs=meleeDirs();
+  const dir=dirs[rank%dirs.length];
+  u._slotDy=dir.dy;
+  let want=0, flankSign=0;
   if(ai==="ranged") want=Math.min(u.rng-4,30);
   else if(ai==="support") want=Math.min(u.rng-2,34);
   else if(ai==="skirm") want=u.rng-1;
-  else want=Math.max(2,u.rng-1);
+  else{
+    want=Math.max(2,u.rng-1);
+    // ближники: делим цель на "слоты" вокруг неё — в лоб, сверху/снизу,
+    // а когда атакующих действительно много — часть заходит с неудобной стороны
+    if(rank>=slots) want+=8+(rank-slots)*6;           // мест по кругу не осталось — ждать позади
+    else if(dir.flank) flankSign=(u.side==="e"?-1:1); // заходит не с той стороны, что остальные
+  }
   // раненые слабые враги пятятся
   if(u.side==="e"&&u.hp/u.hpMax<0.22&&!u.boss&&Math.random()<0.008){
     u.retreat=1.2; clog(`${u.n} пятится, огрызаясь.`); return;
   }
-  if(gap>want+2){
+  if(flankSign){
+    // обходит цель с другой стороны, а не давит с той же, что и остальные
+    const desiredX=clamp(t.x+flankSign*want,2,98);
+    const dx=desiredX-u.x;
+    if(Math.abs(dx)>2){ u.x+=Math.sign(dx)*u.mspd*dt*(1+effSum(u,"hast")); u.x=clamp(u.x,2,98); }
+    else if(Math.random()<0.02){ u.x=clamp(u.x+(Math.random()<0.5?-2:2),2,96); }
+    if(gap<=u.rng) attackIf(u,t,dt);
+  } else if(gap>want+2){
     u.x+=Math.sign(d)*u.mspd*dt*(1+effSum(u,"hast"));
     u.x=clamp(u.x,2,98);
     if(gap<=u.rng) attackIf(u,t,dt);
@@ -6794,6 +6943,11 @@ function act(u){
     u.x+=Math.sign(d)*u.mspd*dt*0.6;
     u.x=clamp(u.x,2,98);
   }
+  // визуальная высота вокруг цели — не влияет на бой, только на отрисовку,
+  // чтобы жетоны атакующих не сливались друг с другом
+  const anchorY=(t.y!=null?t.y:50);
+  const desiredY=clamp(anchorY+(u._slotDy||0),6,94);
+  u.y=(u.y!=null?u.y:desiredY)+(desiredY-(u.y!=null?u.y:desiredY))*Math.min(1,3*dt);
 }
 function attackIf(u,t,dt){
   if(u.atk>0) return;
@@ -6893,7 +7047,17 @@ function bossPhase(u){
   }
   if(CBT.pauseOn.phase!==false) setPause(true);
 }
-function setPause(p){ CBT.paused=p; if(!CBT._silent) renderBattle(); }
+function setPause(p){
+  // true/"true"/1 = пауза; false/"false"/0 = бой идёт
+  CBT.paused=(p===true||p==="true"||p===1);
+  if(!CBT.paused){
+    // на всякий случай поднять таймер, если сбился
+    if(CBT.on&&!CBT.timer) CBT.timer=setInterval(tick,100);
+    // если нет целей — назначить
+    try{ (CBT.units||[]).forEach(u=>{ if(!u.dead&&(!u.tgt||u.tgt.dead)) u.tgt=(typeof pickTarget==="function"?pickTarget(u):null); }); }catch(e){}
+  }
+  if(!CBT._silent) renderBattle();
+}
 
 function endBattle(win){
   try{ if(win) bumpNoiseHere(10); else bumpNoiseHere(6); }catch(e){}
@@ -7215,7 +7379,7 @@ function endBattle(win){
 }
 function tameCheck(){
   const node=CBT.node; if(!node||node.reg!==2) return;
-  const cap=2+Math.floor(S.a.cha/6)+(S.cls==="tam"||S.sub==="tam"?2:0);
+  const cap=2+Math.floor(chaEff()/6)+(S.cls==="tam"||S.sub==="tam"?2:0);
   if(S.pets.length>=cap) return;
   const chance=0.10+(S.a.wil*0.012)+((S.cls==="tam"||S.sub==="tam")?0.25:0);
   if(Math.random()>chance) return;
@@ -7265,7 +7429,7 @@ function prisonerScene(list){
   const key="pr"+uid();
   const one=list[0];
   const isCult=one.ft==="cult";
-  const chaOk=S.a.cha>=10;
+  const chaOk=chaEff()>=10;
   const capOk=(S.party||[]).filter(p=>!p.civ).length<capCombat();
   window[key]=[
     ["Отпустить",()=>{ repShift("krov",1); loyAll(3,"мы не добивали сдавшихся",p=>p.cond==="nokill");
@@ -7322,7 +7486,7 @@ function prisonerScene(list){
       echoAdd(isCult?"cult_talked":"raider_grudge",rnd(5,12));
       return (isCult?"Дети Шва принимают смерть спокойно, почти с облегчением — как будто именно этого и ждали. ":"Никто не сопротивляется. С тел остаётся больше, чем стоило бы.")
         +"<div class='syswin'>"+g.map(lootLine).join("")+"</div>"; }],
-    ["Предложить пойти с тобой"+(!capOk?" (нет места в отряде)":!chaOk?` (нужна Харизма 10, сейчас ${S.a.cha})`:""),()=>{
+    ["Предложить пойти с тобой"+(!capOk?" (нет места в отряде)":!chaOk?` (нужна Харизма 10, сейчас ${chaEff()})`:""),()=>{
       if(!capOk) return "В отряде нет места, и они это видят.";
       if(!chaOk) return "Тебе не хватает харизмы, чтобы его уговорить.";
       const nm=pick(MERCNAMES), lv=Math.max(1,(one.lv||S.lvl)-1);
@@ -7333,6 +7497,7 @@ function prisonerScene(list){
       allyInit(S.party[S.party.length-1]);
       loyAll(-3,"мы взяли к себе вчерашнего врага",p=>p.cond==="nokill");
       stat("recruited");
+      checkTitles(); achvCheck();
       return nm+" поднимается, отряхивается и берёт своё оружие обратно. Доверия к тебе у него пока мало.";
     },!chaOk||!capOk]
   ];
@@ -7410,8 +7575,10 @@ function battleShell(sel){
     <div class="ui-sec" style="margin-top:6px">Бойцы и враги (тап = выбрать / назначить цель)</div>
     <div id="cbtStrip" class="row" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px"></div>
     <div class="ui-sec">Управление</div>
+    ${CBT.paused?'<div class="mut" style="margin:4px 0;color:var(--warn)">Бой на паузе. Назначь цель (тап по врагу в списке) и нажми «Продолжить бой» — время пойдёт в реальном времени.</div>':""}
     <div class="row">
-      <button class="btn-main" style="flex:1" onclick="setPause(${CBT.paused?"false":"true"})">${CBT.paused?"▶ Продолжить":"⏸ Пауза"}</button>
+      <button class="btn-main" style="flex:1" onclick="setPause(false)">${CBT.paused?"▶ Продолжить бой":"▶ Бой идёт"}</button>
+      <button onclick="setPause(true)">⏸ Пауза</button>
       <button onclick="cycleSpeed()">Скорость ×${CBT.spd}</button>
       <button onclick="fastBattle()">⏩ До конца</button>
       <button class="btn-danger" onclick="flee()">Отход</button>
@@ -7489,13 +7656,10 @@ function syncTokens(){
       field.appendChild(el);
       CBT.els[u.id]=el;
     }
-    const field=$("cfield");
     const fh=field?(field.clientHeight||110):110;
-    const nSide=CBT.units.filter(x=>x.side===u.side&&!x.dead).length||1;
-    const idx=u._laneI!=null?u._laneI:0;
-    const frac=battleLaneY(u.side,idx,nSide,!!(u.pet||u.summon));
+    const yFrac=clamp((u.y!=null?u.y:50),4,96)/100;
     el.style.left=clamp(u.x,2,96)+"%";
-    el.style.top=Math.round(frac*Math.max(80,fh-28))+"px";
+    el.style.top=Math.round(yFrac*Math.max(80,fh-28))+"px";
     el.style.opacity=u.dead?"0":(hasEff(u,"stun")?".5":"1");
     el.style.transform=u.dead?"translateX(-50%) scale(.7)":"translateX(-50%)";
     el.classList.toggle("selT",u.id===CBT.sel);
@@ -7849,7 +8013,7 @@ function negotiationTable(foes,node){
   const rep=Math.max(S.rep||0,S.repC||0);
   const nameOK=rep>=3;
   const badgeVisible=!!S.krovDone;
-  const chaOK=S.a.cha>=6;
+  const chaOK=chaEff()>=6;
   const pw=powerRatio(foes);
   const weFar=pw.r>=1.8, theyFar=pw.r<=0.55;
   const intro=weFar?"Их взгляды скользят по твоему отряду и снаряжению — прикидывают шансы и явно им не рады.":
@@ -9113,7 +9277,7 @@ const SURV=[
       takeMat("essence",2); const c=mkCard("skill",pick(Object.keys(SKILLS)),rnd(2,4)); S.cards.push(c); noteCard(c);
       return "Обмен состоялся: "+cardName(c)+"."; }]]},
  {id:"hmur",n:"Хмурый",d:"Стоит посреди дороги с ружьём и очень плохим настроением.",
-  a:[["Разойтись миром (Харизма)",()=>{ if(S.a.cha>=12||Math.random()<0.4){ gainXp(40);
+  a:[["Разойтись миром (Харизма)",()=>{ if(chaEff()>=12||Math.random()<0.4){ gainXp(40);
       return "Он опускает ствол и уходит в сторону, не поворачиваясь спиной."; }
       return ambushRet(nodeById(S.at),"Он стреляет первым."); }],
      ["Напасть",()=>ambushRet(nodeById(S.at),"Ты не даёшь ему договорить.",1)],
@@ -9138,7 +9302,7 @@ const FIRSTMEET=[
  {id:"fm_foe",t:"Двое у витрины",
   d:"Обшаривают магазин. Один уже заметил тебя и не выглядит дружелюбным.",
   a:[["Уйти тихо",()=>{ gainXp(20); return "Ты отступаешь за угол. Они не пошли следом."; }],
-    ["Договориться",()=>{ if(S.a.cha>=8||Math.random()<0.5){ S.tok+=10;
+    ["Договориться",()=>{ if(chaEff()>=8||Math.random()<0.5){ S.tok+=10;
       return "Разговор вышел коротким и мирным. Тебе даже отсыпали кристаллов: +10."; }
       return ambushRet(nodeById(S.at),"Договориться не вышло."); }],
     ["Напасть",()=>ambushRet(nodeById(S.at),"Ты бьёшь первым.")]]}
@@ -12092,6 +12256,7 @@ function takeResident(id,i){
   h.res.splice(i,1); hubGrow(id,-1,"ушёл с тобой");
   stat("recruited");
   sysmsg(r.n+" собрал вещи и пошёл с тобой.");
+  checkTitles(); achvCheck();
   closeModal(); render(); save();
 }
 
@@ -13045,7 +13210,7 @@ function dgDone(){
   }
 
   // соло-серия / рекорды
-  if(solo){ S.soloGateStreak=(S.soloGateStreak||0)+1; stat("gatesSolo"); }
+  if(solo){ S.soloGateStreak=(S.soloGateStreak||0)+(gateArtBonus("gateSolo")?2:1); stat("gatesSolo"); }
   else S.soloGateStreak=0;
   S.gateRecords=S.gateRecords||{bestSolo:0,bestRank:0,clean:0};
   if(solo&&(S.soloGateStreak>S.gateRecords.bestSolo)) S.gateRecords.bestSolo=S.soloGateStreak;
@@ -13286,8 +13451,9 @@ function loyAll(n,why,filter){
 function isCiv(tr){ return !!(TRAITS[tr]&&TRAITS[tr].civ); }
 function combatParty(){ return (S.party||[]).filter(p=>!p.civ&&!p.away&&!p.home); }
 function civParty(){ return (S.party||[]).filter(p=>p.civ); }
-function capCombat(){ return 2+Math.floor(S.a.cha/6); }
-function capCiv(){ return 3+Math.floor(S.a.cha/4); }
+function chaEff(){ return derive(S).a.cha; } // харизма с учётом бонусов от снаряжения, а не только родного стата
+function capCombat(){ return 2+Math.floor(chaEff()/6); }
+function capCiv(){ return 3+Math.floor(chaEff()/4); }
 function recruit(r){
   const C=CLASSES.find(c=>c.k===r.cls);
   const lv=Math.max(1,S.lvl-1);
@@ -13297,6 +13463,7 @@ function recruit(r){
   const np=S.party[S.party.length-1];
   allyInit(np); np.hp=allyPower(np).hpMax;
   sysmsg("В отряде новый человек: "+r.n+" ("+C.n+").");
+  checkTitles(); achvCheck();
 }
 function repairAll(){
   const need=Object.values(S.eq).filter(i=>i&&i.dur<i.durMax);
@@ -13924,7 +14091,6 @@ function vMap(){
         ${tempPtsAt(S.at).length?`<button onclick="tempPtMenu()">⏱ Точки (${tempPtsAt(S.at).length})</button>`:""}
         <button onclick="debtMenu()">📜 Долги${(S.debts||[]).filter(d=>!d.done).length?" ("+(S.debts||[]).filter(d=>!d.done).length+")":""}</button>
         ${(S.at==="dump"||S.at==="vahta"||noiseHere(S.at)>=25)?`<button onclick="blackMarket()">🕶 Чёрный рынок</button>`:""}
-        <button onclick="vehMenu()">${S.veh?vehOf(S.veh.t).ic+" "+vehOf(S.veh.t).n:"🚗 Гараж"}</button>
       </div>
       `}
     ${!tutOn()&&(S.siegePending&&S.siegePending.id===S.at)?`<div class="row" style="margin-top:8px">
@@ -14017,6 +14183,8 @@ function vHero(){
     <div class="panel"><h2>${esc(S.name)}</h2>
     <div class="mut">${clsName(S.cls)}${S.sub?" + "+clsName(S.sub):""} · ${S.gender==="f"?"женщина":"мужчина"} · ${ORIGINS.find(o=>o.k===S.org).n}
     · ранг <span class="${RAR[S.rank||0].c}">${RAR[S.rank||0].n}</span></div>
+    ${(S.rank||0)<7?`<button class="btn-main" style="width:100%;margin-top:6px" onclick="evolve()">
+      Эволюция до ранга «${RAR[(S.rank||0)+1].n}» — очков эволюции: ${S.evo||0}/${EVOCOST[S.rank||0]}</button>`:""}
     ${chips}
     <div class="mut" style="margin-top:6px">${moraleIcon()} Мораль: <b>${S.morale===undefined?50:S.morale}</b>/100 — ${moraleText()}</div>
     ${S.ap>0?`<div class="syswin"><div class="t">СВОБОДНЫЕ ОЧКИ: ${S.ap}</div>Распредели характеристики.</div>`:""}
@@ -14042,9 +14210,9 @@ function vHero(){
       const stR=okFeed?(0.4*(d.regen||1)*(1+Math.min(1.2,partyTrait("stamregen")))):(S.food<=25||S.water<=25?-1.5:0);
       const enR=okFeed?(2*(d.ethRegen||1)):0;
       const frMul=((S.org==="far")?0.7:1)*(wIs("frost")?1.4:1)*(hasUq("u_ration")?0.5:1)
-        *(1-Math.min(0.4,partyTrait("food")))*(1+combatParty().length*0.12);
+        *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12);
       const foodR=-1.1*frMul;
-      const waterMul=(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.4,partyTrait("water")))*(1+combatParty().length*0.1);
+      const waterMul=(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1);
       const waterR=-1.6*waterMul;
       const fmt=v=>(v>=0?"+":"")+(Math.round(v*10)/10);
       return `<div class="stat"><span>Здоровье</span><b class="${hpR>=0?"r2":"r6"}">${fmt(hpR)}/ч</b></div>
@@ -14133,8 +14301,8 @@ function useRunwayDays(){
     if(u.heal) healQ+=u.heal*(i.q||1);
   });
   const fr=((S.org==="far")?0.7:1)*(wIs("frost")?1.4:1)*(hasUq("u_ration")?0.5:1)
-    *(1-Math.min(0.4,partyTrait("food")))*(1+combatParty().length*0.12);
-  const wr=(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.4,partyTrait("water")))*(1+combatParty().length*0.1);
+    *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12);
+  const wr=(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1);
   const foodPerDay=1.1*fr*24, waterPerDay=1.6*wr*24;
   // сколько урона герой в среднем получает за день — берём реальную статистику боёв,
   // а пока данных мало, подстраховываемся консервативной долей от максимума HP
@@ -14803,22 +14971,23 @@ function gearCompareBlock(it){
   if(isDeadZone(S.at)&&S.org!=="str"&&S.org!=="mil"){
     return `<div class="panel" style="padding:8px;margin-top:8px"><div class="mut">🔇 Система молчит здесь — сравнить характеристики нечем. Придётся решать на глаз, как раньше.</div></div>`;
   }
-  const candidates=(S.party||[]).filter(p=>!p.civ&&!p.away&&!p.home);
+  const candidates=(S.party||[]).filter(p=>!p.civ&&!p.away&&!p.home&&!wearBlockReason(it,p));
   const cols=[];
+  // Сравниваем с героем только если он может надеть (пол/требования)
+  const heroOk=!wearBlockReason(it,S);
   if(it.s==="wpn"){
-    cols.push({name:"Осн. рука",it:S.eq.wpn});
-    cols.push({name:"Втор. рука",it:S.eq.wpn2});
+    if(heroOk){ cols.push({name:"Осн. рука",it:S.eq.wpn}); cols.push({name:"Втор. рука",it:S.eq.wpn2}); }
   } else if(it.s==="ring"){
-    const n=ringSlotCount();
-    for(let i=1;i<=n;i++) cols.push({name:i===1?"Кольцо 1":"Кольцо "+i,it:S.eq[i===1?"ring":"ring"+i]});
+    if(heroOk){ const n=ringSlotCount();
+      for(let i=1;i<=n;i++) cols.push({name:i===1?"Кольцо 1":"Кольцо "+i,it:S.eq[i===1?"ring":"ring"+i]}); }
   } else if(it.s==="neck"){
-    const n=neckSlotCount();
-    for(let i=1;i<=n;i++) cols.push({name:i===1?"Амулет 1":"Амулет "+i,it:S.eq[i===1?"neck":"neck"+i]});
-  } else {
-    cols.push({name:"Надето",it:S.eq[it.s]});
+    if(heroOk){ const n=neckSlotCount();
+      for(let i=1;i<=n;i++) cols.push({name:i===1?"Амулет 1":"Амулет "+i,it:S.eq[i===1?"neck":"neck"+i]}); }
+  } else if(heroOk) {
+    cols.push({name:"На тебе",it:S.eq[it.s]});
   }
-  cols.push({name:"Новое",it:it});
-  candidates.slice(0,2).forEach(p=>{ cols.push({name:esc(p.n),it:(p.eq||{})[it.s]||null}); });
+  cols.push({name:"Это",it:it});
+  candidates.slice(0,3).forEach(p=>{ cols.push({name:esc(p.n),it:(p.eq||{})[it.s]||null}); });
   const statKeys=new Set(["dmg","def"]);
   cols.forEach(c=>{ if(c.it&&c.it.st) Object.keys(c.it.st).forEach(k=>statKeys.add(k)); });
   const rows=[...statKeys].filter(k=>cols.some(c=>c.it&&((k==="dmg"||k==="def")?c.it[k]:( c.it.st&&c.it.st[k]))))
@@ -14894,10 +15063,9 @@ function showItem(uid,equipped){
           ${it.s==="ring"?ringNeckButtons(uid,"ring",ringSlotCount()):""}
           ${it.s==="neck"?ringNeckButtons(uid,"neck",neckSlotCount()):""}
           ${(()=>{ if(equipped||it.s==="art"||it.s==="bag") return "";
-            const w=worstEquippedAlly(it.s); if(!w) return "";
-            if((w.p.eq||{})[it.s]&&itemScore((w.p.eq||{})[it.s])>=itemScore(it)) return "";
-            if(wearBlockReason(it,w.p)) return "";
-            return `<button onclick="equipAlly(${w.idx},'${uid}','${it.s}')">Отдать ${esc(w.p.n)} — ${pn(w.p,"у него","у неё")} хуже всех</button>`; })()}`}
+            const fit=(S.party||[]).map((p,i)=>({p,i})).filter(x=>!x.p.civ&&!x.p.away&&!wearBlockReason(it,x.p));
+            if(!fit.length) return `<span class="mut" style="font-size:12px">Некому отдать (пол/требования)</span>`;
+            return fit.slice(0,6).map(({p,i})=>`<button onclick="equipAlly(${i},'${uid}','${it.s}')">Отдать: ${esc(p.n)}</button>`).join(""); })()}`}
       ${it.sock?`<button onclick="socketMenu('${uid}')">💎 Гнёзда (${(it.gems||[]).length}/${it.sock})</button>`:""}
       <button onclick="toggleLock('${uid}')">${it.lock?"Разблокировать":"🔒 Заблокировать"}</button>
       ${equipped||it.lock?"":`<button class="btn-danger" onclick="dropItem('${uid}')">Выбросить</button>`}
@@ -15763,7 +15931,8 @@ function vParty(){
   </div>`;
 
   let body="";
-  if(tab==="mates"){
+  if(tab==="traits"){ body=""; }
+  else if(tab==="mates"){
     const mates=sortMates((S.party||[]).slice());
     const combS=mates.filter(p=>!p.civ), civS=mates.filter(p=>p.civ);
     body=`${partyRoster()}
@@ -15857,12 +16026,13 @@ function vParty(){
     <div class="mut">Боевых: ${comb.length}/${capCombat()} · мирных: ${civ.length}/${capCiv()} · питомцев: ${(S.pets||[]).length} · гараж: ${(S.garage||[]).length}${S.veh?" · в пути: "+esc(vehOf(S.veh.t).n):" · пешком"}</div>
     <div class="row" style="margin-top:8px;flex-wrap:wrap;gap:4px">
       ${partyTabBtn("mates",`Спутники (${(S.party||[]).length})`,tab==="mates")}
+      ${partyTabBtn("traits",`Пассивки`,tab==="traits")}
       ${partyTabBtn("hire",`Наём (${free.length})`,tab==="hire")}
       ${partyTabBtn("pets",`Питомцы (${(S.pets||[]).length})`,tab==="pets")}
       ${partyTabBtn("garage",`🚗 Гараж (${(S.garage||[]).length})`,tab==="garage")}
     </div>
   </div>
-  ${partyTraitsPanel()}
+  ${tab==="traits"?partyTraitsPanel(true):""}
   ${body}`;
 }
 function setRow(i){
@@ -16067,7 +16237,7 @@ function oldTryRecruit(id){
   if(civ&&civParty().length>=capCiv()) return toast("Мирных больше не прокормишь. Нужна Харизма.");
   if(!civ&&(S.party||[]).filter(p=>!p.civ).length>=capCombat())
     return toast("Боевых больше не потянешь. Нужна Харизма или отправь кого-то на базу.");
-  if(S.a.cha<r.cost*2){ toast(r.n+" тебе не верит. Нужна Харизма "+r.cost*2+"."); return; }
+  if(chaEff()<r.cost*2){ toast(r.n+" тебе не верит. Нужна Харизма "+r.cost*2+"."); return; }
   recruit(r); render(); save();
 }
 function hubMenu(){
@@ -16571,7 +16741,14 @@ function saveBox(){
         <button style="margin-top:6px;width:100%" onclick="cloudLogoutNow()">Выйти из аккаунта</button>`
       :`<div class="mut" style="font-size:12px">Аккаунт по почте. При сохранении/загрузке сам выбираешь раскладку слотов (до 10). Локально и облако можно разнести по разным номерам.</div>
         <input id="cloudEmail" type="email" placeholder="почта" style="width:100%;margin-top:6px;padding:8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
-        <input id="cloudPass" type="password" placeholder="пароль (от 6 символов)" style="width:100%;margin-top:6px;padding:8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
+        <div style="position:relative;margin-top:6px">
+          <input id="cloudPass" type="password" placeholder="пароль (от 6 символов)" style="width:100%;padding:8px 40px 8px 8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
+          <button type="button" onclick="togglePassVis('cloudPass',this)" style="position:absolute;right:4px;top:4px;padding:4px 8px" title="Показать пароль">👁</button>
+        </div>
+        <div style="position:relative;margin-top:6px">
+          <input id="cloudPass2" type="password" placeholder="ещё раз пароль (для регистрации)" style="width:100%;padding:8px 40px 8px 8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
+          <button type="button" onclick="togglePassVis('cloudPass2',this)" style="position:absolute;right:4px;top:4px;padding:4px 8px" title="Показать пароль">👁</button>
+        </div>
         <div class="row" style="margin-top:6px">
           <button class="btn-main" onclick="cloudRegisterNow()">Зарегистрироваться</button>
           <button onclick="cloudLoginNow()">Войти</button>
@@ -16600,13 +16777,25 @@ function cloudHelp(){
     5. Сохранить файл и открыть заново — здесь появится форма регистрации.</div>
     <button class="btn-main" style="margin-top:8px" onclick="saveBox()">Назад</button>`);
 }
+function togglePassVis(id,btn){
+  const el=$(id); if(!el) return;
+  el.type=el.type==="password"?"text":"password";
+  if(btn) btn.textContent=el.type==="password"?"👁":"🙈";
+}
 async function cloudRegisterNow(){
-  const email=($("cloudEmail")||{}).value, pass=($("cloudPass")||{}).value;
+  const email=($("cloudEmail")||{}).value, pass=($("cloudPass")||{}).value, pass2=($("cloudPass2")||{}).value;
   if(!email||!pass||pass.length<6) return toast2("Нужна почта и пароль от 6 символов.");
+  if(pass2!==undefined&&pass2!==""&&pass!==pass2) return toast2("Пароли не совпадают.");
+  if(!pass2) return toast2("Повтори пароль в поле ниже.");
   toast("Регистрирую…");
   const r=await cloudSignUp(email,pass);
   if(r.error) return toast2(r.error);
-  sysmsg(r.needsConfirm?"Проверь почту и подтверди адрес, потом заходи.":"Готово, ты вошёл.");
+  if(r.needsConfirm){
+    // без письма: сразу пробуем войти (если в Supabase выключено Confirm email — сессия уже есть)
+    const r2=await cloudSignIn(email,pass);
+    if(r2.error) sysmsg("Аккаунт создан. Если не пускает — в Supabase → Authentication → Providers выключи «Confirm email» (лимит писем).");
+    else sysmsg("Готово, ты вошёл.");
+  } else sysmsg("Готово, ты вошёл.");
   saveBox();
 }
 async function cloudLoginNow(){
@@ -17456,6 +17645,7 @@ function hireRace(id,name,cost){
     trait:pick(["gunsmith","hunter2","sapper","techie"]),civ:0,home:0,items:{},script:[],loy:60});
   const p=S.party[S.party.length-1]; allyInit(p);
   sysmsg(name+" ("+w.race+") идёт с тобой.");
+  checkTitles(); achvCheck();
   closeModal(); render(); save();
 }
 /* ---------- ТРАНСПОРТ ---------- */
@@ -18688,6 +18878,7 @@ function quickRecruitWanderer(pid){
   allyInit(S.party[S.party.length-1]);
   stat("recruited");
   sysmsg(nm+" идёт с тобой без лишних вопросов.");
+  checkTitles(); achvCheck();
   peopleView(); save();
 }
 function meetWanderer(pid){
@@ -18729,11 +18920,11 @@ function meetWanderer(pid){
       ["Пройти мимо",()=>{ drop(); return "Вы расходитесь."; }]]);
   }
   if(w.k==="scav"){
-    return choice(WANDER.scav.n,WANDER.scav.d,[
-      ["Обменяться находками",()=>{ drop();
+    return choice(WANDER.scav.n,WANDER.scav.d+" У ног — мешок с находками за сегодня.",[
+      ["Отдать детали за мешок находок (2 детали)",()=>{ drop();
         if(matQ("scrap")<2) return "Ему нечего у тебя взять.";
         takeMat("scrap",2); const g=genLoot(node,derive(S),lootRankRoll(lvRank(S.lvl),extraRank()));
-        return "Обмен: детали ушли, взамен —<div class='syswin'>"+lootLine(g)+"</div>"; }],
+        return "Он высыпает мешок на землю и забирает детали. Что нашлось внутри:<div class='syswin'>"+lootLine(g)+"</div>"; }],
       ["Спросить, где искать",()=>{ drop(); genBuildings(S.at);
         S.nodes[S.at].bld.forEach(b=>{ if(Math.random()<0.4) b.done=0; });
         return "«В том доме ещё не всё вынесли». Часть построек снова стоит проверить."; }]]);
@@ -18752,11 +18943,24 @@ function meetWanderer(pid){
     return choice(WANDER.fake.n,WANDER.fake.d,[
       ["Подойти",()=>{ drop();
         if(Math.random()<0.45){ const r=pick(RECRUITS.filter(x=>!S.party.find(p=>p.id===x.id)));
-          return r?("Человеку правда нужна помощь. Он называется: "+r.n+". Найдёшь его в поселении."):"Ты помогаешь и идёшь дальше."; }
+          if(r){ recruit(r); return "Человеку правда нужна помощь. "+r.n+" идёт с тобой."; }
+          return "Ты помогаешь и идёшь дальше."; }
         return ambushRet(node,"Из-за угла выходят ещё двое. Это была ловушка."); }],
-      ["Окликнуть издалека",()=>{ drop();
-        return Math.random()<0.5?"Он машет рукой и уходит. Похоже, правда просил помощи.":
-          "Он отворачивается и быстро уходит — обманщик."; }],
+      ["Окликнуть издалека",()=>{
+        const real=Math.random()<0.5;
+        if(real){
+          choice("Издалека видно","Он правда машет рукой и оседает на месте — не похоже на притворство.",
+            [["Подойти и помочь",()=>{ drop();
+                const r=pick(RECRUITS.filter(x=>!S.party.find(p=>p.id===x.id)));
+                if(r){ recruit(r); return r.n+" идёт с тобой."; }
+                gainXp(30); return "Ты помогаешь ему подняться. Он благодарит и уходит своей дорогой."; }],
+             ["Уйти",()=>{ drop(); return "Ты решаешь не рисковать и уходишь, оставив его вдалеке."; }]]);
+        } else {
+          choice("Издалека видно","Он держится слишком ровно для раненого — что-то здесь не так.",
+            [["Идти в атаку",()=>{ drop(); return ambushRet(node,"Ты не даёшь ловушке сработать первой.",1); }],
+             ["Уйти",()=>{ drop(); return "Ты уходишь, не подходя ближе."; }]]);
+        }
+        return null; }],
       ["Уйти",()=>{ drop(); return "Ты не подходишь."; }]]);
   }
   if(w.k==="medic"){
@@ -18804,7 +19008,7 @@ function meetWanderer(pid){
   return choice(WANDER.bandit.n,WANDER.bandit.d,[
     ["Откупиться (20 💠)",()=>{ if(S.tok<20) return "Столько у тебя нет.";
       S.tok-=20; drop(); return "Они пересчитывают и расходятся."; }],
-    ["Разойтись миром",()=>{ if(S.a.cha>=12||Math.random()<0.35){ drop();
+    ["Разойтись миром",()=>{ if(chaEff()>=12||Math.random()<0.35){ drop();
       return "Они оценивают твоё оружие и решают не связываться."; }
       drop(); return ambushRet(node,"Разговор не вышел."); }],
     ["Ударить первым",()=>{ drop(); return ambushRet(node,"Ты не даёшь им начать.",1); }]]);
@@ -19044,7 +19248,7 @@ function payoutTwist(q,fac,onPay){
     window[key]=[
       ["Уйти ни с чем",()=>{ if(fac==="krov") repShift("krov",-1);
         return "Ты разворачиваешься и уходишь. За спиной кто-то облегчённо выдыхает."; }],
-      ["Надавить (Харизма)",()=>{ if(S.a.cha>=12||Math.random()<0.4){ onPay(1);
+      ["Надавить (Харизма)",()=>{ if(chaEff()>=12||Math.random()<0.4){ onPay(1);
           return "Ты говоришь ровно и негромко, и через минуту кристаллы оказываются на столе."; }
         return "«Нечем платить — и всё». Разговор окончен, ты остаёшься ни с чем."; }],
       ["Взять своё силой",()=>{ onPay(1.5); if(fac==="krov") repShift("krov",-3); else repShift("convoy",-3);
@@ -19065,7 +19269,7 @@ function payoutTwist(q,fac,onPay){
       ["Заплатить "+fee+" 💠",()=>{ if(S.tok<fee) return "Столько у тебя нет.";
         S.tok-=fee; onPay(1); return "Ты платишь «за оформление» и получаешь своё. Осадок остаётся."; }],
       ["Отказаться",()=>{ return "Ты уходишь без оплаты. Он делает вид, что так и было задумано."; }],
-      ["Ответить резко",()=>{ if(S.a.cha>=14||Math.random()<0.35){ onPay(1);
+      ["Ответить резко",()=>{ if(chaEff()>=14||Math.random()<0.35){ onPay(1);
           return "Пара фраз — и «пошлина» внезапно отменяется."; }
         setTimeout(()=>{ if(!CBT.on) queueModal(()=>hitContract(nodeById(S.at),q.giver)); },400);
         return "Он кивает кому-то за твоей спиной."; }]
@@ -19727,6 +19931,7 @@ function companyHire(i){
   S.mercs.splice(i,1);
   const sense=senseIntegrity(entry.integ);
   sysmsg(m.n+" нанят в компанию."+(sense.level==="full"?" Характер ясен: "+INTEGRITY[entry.integ].n+".":""));
+  checkTitles(); achvCheck();
   save(); tavernHireMenu();
 }
 function companyManage(){
@@ -20506,6 +20711,7 @@ function hire(i){
   S.mercs.splice(i,1);
   sysmsg(m.n+" нанят.");
   if(warn) showToast("⚠ "+warn,"lvl");
+  checkTitles(); achvCheck();
   closeModal(); render(); save();
 }
 
@@ -20632,6 +20838,75 @@ const SHOP=[
   {id:"water",p:2},{id:"cans",p:4},{id:"bandage",p:3},{id:"medkit",p:7},
   {id:"stimpack",p:9},{id:"scrap",p:3},{id:"fiber",p:3},{id:"essence",p:14,rep:2},{id:"spark",p:90,rep:3},{id:"oblivion",p:45,rep:2},{id:"antibio",p:12},{id:"pills",p:6},{id:"splint",p:5},{id:"grenade",p:9},{id:"smoke",p:5},{id:"flare",p:6}
 ];
+
+/* ---------- ОТНОШЕНИЯ С ТОРГОВЦЕМ ---------- */
+/* Отдельная личная шкала — не путать с репутацией Убежища (S.rep).
+   Растёт от покупок/продаж (сумма сделки + ранг/качество вещи).
+   Уровень 1 — обычные цены. Дальше пороги растут (100 / 250 / 400 / 550),
+   а с ними — скидка на покупку, надбавка на продажу и ассортимент. */
+const TRADER_REL_MAX=5;
+const TRADER_REL_TIERS=[
+  {buyMul:1.00,sellMul:1.00,extra:0},
+  {buyMul:0.95,sellMul:1.05,extra:1},
+  {buyMul:0.90,sellMul:1.10,extra:2},
+  {buyMul:0.85,sellMul:1.15,extra:3},
+  {buyMul:0.80,sellMul:1.20,extra:4}
+];
+function traderRelNeed(lvl){ return 100+150*(lvl-1); }
+function traderRelTier(){ return TRADER_REL_TIERS[Math.min(TRADER_REL_MAX,Math.max(1,(S.traderRel&&S.traderRel.lvl)||1))-1]; }
+function traderRelBuyMul(){ return traderRelTier().buyMul; }
+function traderRelSellMul(){ return traderRelTier().sellMul; }
+function traderRelExtra(){ return traderRelTier().extra; }
+function traderRelAdd(n){
+  S.traderRel=S.traderRel||{lvl:1,xp:0};
+  if(S.traderRel.lvl>=TRADER_REL_MAX) return;
+  S.traderRel.xp+=Math.max(0,n);
+  let leveled=false;
+  while(S.traderRel.lvl<TRADER_REL_MAX&&S.traderRel.xp>=traderRelNeed(S.traderRel.lvl)){
+    S.traderRel.xp-=traderRelNeed(S.traderRel.lvl);
+    S.traderRel.lvl++; leveled=true;
+  }
+  if(leveled){
+    sysmsg("Отношения с торговцем выросли: уровень "+S.traderRel.lvl+".");
+    showToast(`🤝 <b>Торговец</b> · уровень ${S.traderRel.lvl}`);
+  }
+}
+function traderRelGainBuy(price){ return Math.max(1,Math.round(price/8)); }
+function traderRelGainSell(price,rank){ return Math.max(1,Math.round(price/8)+(rank||0)*3); }
+/* Пулы для ассортимента: гарантированный минимум (провиант/медикаменты/материалы),
+   плюс доп. варианты за уровень отношений. Список каждый день слегка меняется. */
+const TRADER_POOLS={
+  prov:["bread","jerky","cans","soup","porridge","stew","smokedfish","cheese","ricepack","mre","hardtack","kvass","broth","cleanflask","filter"],
+  med:["bandage","medkit","splint","pills","salve","tourniquet","purgekit","antidote","painkiller","coldpack","fieldkit","iodinevial","charcoal"],
+  mat:["scrap","fiber","parts","oil","tire","battery","airfilter","plating","fuel"]
+};
+function traderStockPrice(id){
+  const u=USABLE[id]; if(!u) return 5;
+  let v=0;
+  if(u.food) v+=u.food*0.15;
+  if(u.water) v+=u.water*0.15;
+  if(u.heal) v+=u.heal*0.15;
+  if(u.energy) v+=u.energy*0.12;
+  if(u.med) v+=6;
+  if(u.mat) v+=4;
+  return Math.max(2,Math.round(v));
+}
+function traderStock(){
+  if(S.tday!==S.day||!(S.traderStock||[]).length){
+    S.tday=S.day;
+    const extra=traderRelExtra();
+    const takeN=(pool,n)=>{ const c=pool.slice(); const out=[];
+      while(out.length<n&&c.length) out.push(c.splice(rnd(0,c.length-1),1)[0]);
+      return out; };
+    const rows=[
+      ...takeN(TRADER_POOLS.prov,Math.min(TRADER_POOLS.prov.length,2+extra)),
+      ...takeN(TRADER_POOLS.med,Math.min(TRADER_POOLS.med.length,1+extra)),
+      ...takeN(TRADER_POOLS.mat,Math.min(TRADER_POOLS.mat.length,1+extra))
+    ];
+    S.traderStock=rows.map(id=>({id,p:traderStockPrice(id)}));
+  }
+  return S.traderStock.filter(x=>!SHOP.some(s=>s.id===x.id));
+}
 function traderGlutPhrase(mk){
   const n=(S.market||{})[mk]||0;
   if(n<6) return "";
@@ -20652,7 +20927,7 @@ function trader(){
     Торговец не разбирает товар в потёмках — только разводит руками. Свет обещают через ${hub("shelter").blackout} ${plural(hub("shelter").blackout,"ночь","ночи","ночей")}.</div>
     <button class="btn-main" onclick="closeModal()">Понятно</button>`,true);
   const dom=dominantEvoPath();
-  const gear=S.inv.filter(i=>!i.use&&!i.trinket);
+  const gear=S.inv.filter(i=>!i.use&&!i.gem&&!i.trinket);
   const tLines=S.rep>=5?[
     "«Для тебя отложил чуть лучше, чем на витрине. Не благодари — просто бери».",
     "Торговец кивает: «Свой. Без лишней наценки».",
@@ -20664,15 +20939,22 @@ function trader(){
     "Перебирает банки: «Еда, вода, бинты. Геройство продаём отдельно — и дороже».",
   ];
   if(typeof dayModIs==="function"&&dayModIs("marketday")) tLines.push("«День обмена — даже я уступил на еде. Не каждый день такое».");
+  const tr=S.traderRel||{lvl:1,xp:0};
+  const trNeed=tr.lvl<TRADER_REL_MAX?traderRelNeed(tr.lvl):null;
+  const stock=traderStock();
   openModal(`<h3>Торговец</h3>
     <div class="item" style="cursor:default;margin-bottom:6px"><span class="mut">💬 ${esc(pick(tLines))}</span></div>
     <div class="mut">💠 ${S.tok} · репутация: ${S.rep}</div>
+    <div class="mut">🤝 Отношения с торговцем: уровень ${tr.lvl}${trNeed?` (${tr.xp}/${trNeed})`:" (максимум)"}</div>
     ${S.dirty?'<div class="mut" style="color:var(--warn)">«Не с порога», — кривится торговец, отодвигая товар подальше. Цены сегодня чуть хуже.</div>':""}
     ${(S.wanted&&S.wanted.judge)?'<div class="mut" style="color:var(--warn)">«Слышал, как ты вершишь суд без суда», — торговец не отказывает, но и лишний раз глаз не поднимает.</div>':""}
     ${dom?`<div class="mut" style="font-size:12px">${EVOSCAR[dom].trader}</div>`:""}<hr>
     <h3>Купить</h3>
     <div class="row">${SHOP.filter(x=>!x.rep||S.rep>=x.rep).map(x=>{ const disc=seasonDiscount(x.id);
       return `<button onclick="buy('${x.id}',${x.p})">${USABLE[x.id].ic} ${USABLE[x.id].n}${disc<1?' <span style="color:var(--r2)">🌊</span>':""}<br><span class="mut">${Math.round(x.p*disc)} крист.${disc<1?" (сезон)":""}</span></button>`;}).join("")}</div>
+    ${stock.length?`<div class="mut" style="margin-top:8px;font-size:12px">Сегодняшний привоз${tr.lvl>1?" (шире — отношения выше)":""}:</div>
+    <div class="row" style="margin-top:4px">${stock.map(x=>{ const disc=seasonDiscount(x.id);
+      return `<button onclick="buy('${x.id}',${x.p})">${USABLE[x.id].ic} ${USABLE[x.id].n}${disc<1?' <span style="color:var(--r2)">🌊</span>':""}<br><span class="mut">${Math.round(x.p*disc)} крист.${disc<1?" (сезон)":""}</span></button>`;}).join("")}</div>`:""}
     ${S.rep>=3?`<div class="row" style="margin-top:6px">
       <button class="btn-main" onclick="buyCrate()">Ящик со снаряжением<br><span class="mut">30 кристаллов</span></button></div>`:
       '<div class="mut" style="margin-top:6px">С репутацией 3 откроются ящики со снаряжением.</div>'}
@@ -20696,10 +20978,10 @@ function seasonDiscount(k){
   const exp=(S.priceSeason||{})[k];
   return (exp&&S.day<=exp)?0.5:1;
 }
-function buy(id,p){ p=Math.max(1,Math.round(p*(1-Math.min(0.4,partyTrait("trade")))*reputationName().price*seasonDiscount(id)*(S.dirty?1.08:1)*(typeof dayModShopMult==="function"?dayModShopMult():1)));
+function buy(id,p){ p=Math.max(1,Math.round(p*(1-Math.min(0.4,partyTrait("trade")))*reputationName().price*traderRelBuyMul()*seasonDiscount(id)*(S.dirty?1.08:1)*(typeof dayModShopMult==="function"?dayModShopMult():1)));
   if(S.tok<p) return toast2("Не хватает кристаллов.");
   stat("tokSpent",p); stat("bought");
-  S.tok-=p; addUse(S,id,1); save(); trader(); }
+  S.tok-=p; addUse(S,id,1); traderRelAdd(traderRelGainBuy(p)); save(); trader(); }
 function buyCrate(){ if(S.tok<30) return toast2("Нужно 30 кристаллов.");
   S.tok-=30; const base=pick(ITEMBASE.filter(b=>b.lv<=S.lvl+3));
   const it=mkItem(base,rollRarity(0.6),S.lvl+1); S.inv.push(it); S.found++; noteFound(it);
@@ -20734,8 +21016,8 @@ function sellConfirmed(uid,p){ const it=S.inv.find(i=>i.uid===uid); if(!it) retu
   S.market=S.market||{}; const mk=it.s||it.use||"misc";
   S.market[mk]=(S.market[mk]||0)+1;
   const glut=Math.min(0.5,(S.market[mk]||0)*0.03);
-  p=Math.round(p*(1+Math.min(0.4,partyTrait("trade")))*(1-glut)*(S.dirty?0.92:1));
-  S.inv=S.inv.filter(i=>i.uid!==uid); S.tok+=p; save(); trader(); }
+  p=Math.round(p*(1+Math.min(0.4,partyTrait("trade")))*(1-glut)*(S.dirty?0.92:1)*traderRelSellMul());
+  S.inv=S.inv.filter(i=>i.uid!==uid); S.tok+=p; traderRelAdd(traderRelGainSell(p,it.r)); save(); trader(); }
 
 const CRAFT_RECIPES=[
   {id:"bandage",n:"Бинты ×2",need:{fiber:2}},
@@ -20915,17 +21197,59 @@ const NAMES=["Ирма","Тимур","Юна","Марко","Астрид","Ка�
   "Роксана","Каспар","Найя","Тобиас","Ксения","Юсуф"];
 let CC={cls:"war",org:"mil",diff:"normal",gender:"m",name:pick(NAMES)};
 function rollName(){ const el=$("nm"); CC.name=pick(NAMES.filter(n=>n!==CC.name)); if(el) el.value=CC.name; creator(); }
+function isGuestPlay(){ try{ return sessionStorage.getItem("rift_guest")==="1"; }catch(e){ return !!window.AUTH_GUEST; } }
+function setGuestPlay(){ try{ sessionStorage.setItem("rift_guest","1"); }catch(e){} window.AUTH_GUEST=1; render(); }
+function clearGuestPlay(){ try{ sessionStorage.removeItem("rift_guest"); }catch(e){} window.AUTH_GUEST=0; }
+function titleAuthPanel(){
+  cloudInit();
+  const authed=!!SBUSER;
+  if(authed) return `<div class="panel"><div class="mut">Вход: ${esc(SBUSER.email||"аккаунт")}</div>
+    <div class="row" style="margin-top:6px"><button onclick="cloudLogoutNow();clearGuestPlay();S=null;render()">Выйти</button>
+    <button class="btn-main" onclick="render()">К слотам</button></div></div>`;
+  return `<div class="panel"><h3>Вход</h3>
+    <div class="mut">С аккаунтом — облачные слоты. Гость — только локальные сохранения на этом устройстве.</div>
+    <input id="cloudEmail" type="email" placeholder="почта" style="width:100%;margin-top:6px;padding:8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
+    <div style="position:relative;margin-top:6px">
+      <input id="cloudPass" type="password" placeholder="пароль (от 6 символов)" style="width:100%;padding:8px 40px 8px 8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
+      <button type="button" onclick="togglePassVis('cloudPass',this)" style="position:absolute;right:4px;top:4px;padding:4px 8px">👁</button>
+    </div>
+    <div style="position:relative;margin-top:6px">
+      <input id="cloudPass2" type="password" placeholder="повтор пароля (только регистрация)" style="width:100%;padding:8px 40px 8px 8px;background:#0A0D11;color:var(--tx);border:1px solid var(--line);border-radius:6px">
+      <button type="button" onclick="togglePassVis('cloudPass2',this)" style="position:absolute;right:4px;top:4px;padding:4px 8px">👁</button>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn-main" onclick="titleLogin()">Войти</button>
+      <button onclick="titleRegister()">Регистрация</button>
+    </div>
+    <button style="width:100%;margin-top:8px" onclick="setGuestPlay()">Играть как гость (локально)</button>
+    <div class="mut" style="margin-top:6px;font-size:12px">Чтобы не было «email rate limit»: в Supabase → Authentication → Providers → Email выключи Confirm email.</div>
+  </div>`;
+}
+async function titleLogin(){
+  const email=($("cloudEmail")||{}).value, pass=($("cloudPass")||{}).value;
+  if(!email||!pass) return toast2("Введи почту и пароль.");
+  toast("Вхожу…");
+  const r=await cloudSignIn(email,pass);
+  if(r.error) return toast2(r.error);
+  clearGuestPlay();
+  sysmsg("Вход выполнен.");
+  render();
+}
+async function titleRegister(){
+  await cloudRegisterNow();
+  if(SBUSER){ clearGuestPlay(); render(); }
+}
 function title(){
+  const allowSlots=!!SBUSER||isGuestPlay()||!(SUPABASE_URL&&SUPABASE_ANON_KEY);
   $("app").innerHTML=`
   <div class="panel" style="text-align:center;padding:26px 14px">
     <div class="sys" style="letter-spacing:6px;font-size:12px">МИР ИЗМЕНИЛСЯ</div>
     <h1 style="margin:8px 0 4px">РАЗЛОМ</h1>
     <div class="mut">Обновлённый мир · версия 7.2 — память мира, зоны, розыск, законы, аудит систем</div>
   </div>
+  ${titleAuthPanel()}
   <div class="panel">
     <p>Это случилось не с одним городом и не с одной страной — небо разошлось швом сразу везде, в один и тот же миг, и правила изменились для всех одновременно, без предупреждения и права отказаться.</p>
-    <p>Часть людей просто не проснулась. Часть увидела перед глазами строку текста, которой там быть не должно: уровень, характеристики, право на добычу. Из свежих швов полезли твари, а границы, паспорта и профессии в одну ночь перестали значить хоть что-нибудь.</p>
-    <p>С тех пор прошёл месяц. Города, где ещё держится свет и стены, называют безопасными зонами — их мало, и путь туда часто длиннее и опаснее, чем кажется на первый взгляд.</p>
     <p class="mut">Ты очнулся в чужом подвале, в незнакомом районе, совсем один. Система уже ждёт — а терпелива она бывает недолго.</p>
     <div class="row" style="margin-top:8px">
       <button onclick="worldHistMenu(0)">📖 История Разлома</button>
@@ -20935,7 +21259,7 @@ function title(){
       <button onclick="forceRefresh()" style="font-size:12px">🔄 Обновить игру (если видна старая версия)</button>
     </div>
   </div>
-  ${slotsPanel()}`;
+  ${allowSlots?slotsPanel():`<div class="panel"><div class="mut">Слоты сохранений откроются после входа или режима гостя.</div></div>`}`;
 }
 function creator(){
   LASTVIEW="creator"; scrollTop(true);
@@ -21029,6 +21353,7 @@ function fixSave(){
   if(!S.base) S.base={wall:0,garden:0,shop:0,ward:0,radio:0};
   if(!S.bps) S.bps=[];
   if(S.repC===undefined) S.repC=0;
+  if(!S.traderRel) S.traderRel={lvl:1,xp:0};
   if(!S.cjobs) S.cjobs=[];
   if(!S.mercs) S.mercs=[];
   if(!S.company) S.company=[];
@@ -21363,10 +21688,12 @@ $("modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeModal();
 
 (async function boot(){
   await loadSlots();
-  const last=SLOTS.findIndex(d=>d&&d.slot!==undefined);
-  const idx=last>=0?last:SLOTS.findIndex(Boolean);
-  if(idx>=0){ CURSLOT=idx; S=SLOTS[idx]; fixSave(); render(); }
-  else render();
+  try{ cloudInit();
+    if(SB){ const {data}=await SB.auth.getSession(); SBUSER=data&&data.session?data.session.user:null; }
+  }catch(e){}
+  // Сначала экран входа/гостя; в сейв не входим автоматически
+  S=null;
+  render();
   initBack();
 })();
 </script>
