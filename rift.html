@@ -2337,19 +2337,19 @@ NAMED.push(
 const TRAITS={
   fixer:{civ:1,n:"Ремонтник",d:"В руках всё становится чинимым: постройки и ремонт дешевле на 25%. В отряде его зовут, когда скрипит дверь или падает балка.",e:{build:.25}},
   strateg:{civ:1,n:"Стратег",d:"Думает на ход вперёд. +5 к обороне зоны, осады без тебя заканчиваются лучше — на стенах остаются его пометки.",e:{def:5}},
-  forager:{n:"Фуражир",d:"Видит полезное в хламе. +20% материалов и добычи с вылазок. Карманы никогда не бывают совсем пустыми.",e:{loot:.2}},
+  forager:{n:"Фуражир",d:"+20% к количеству материалов и сбора с вылазок (на 1–2 шт. из‑за округления часто незаметно). Также слегка повышает шанс более высокого ранга лута.",e:{loot:.2}},
   drill:{n:"Инструктор",d:"Гоняет отряд до седьмого пота — и это работает: +35% опыта всем. Не любит, когда бьют «как получится».",e:{xp:.35}},
   fieldmedic:{n:"Полевой медик",d:"После боя сразу к раненым. Отряд восстанавливает 12% здоровья по итогам стычки — без лишних речей.",e:{heal:.12}},
   quarter:{civ:1,n:"Завхоз",d:"Торгуется до хрипоты. Покупки дешевле на 20%, продажи выгоднее. Знает цену всему, включая твоё терпение.",e:{trade:.2}},
   gunsmith:{n:"Оружейник",d:"Чистит стволы даже в темноте. +8% урона всему отряду — оружие в его руках не клинит от злости.",e:{dmg:.08}},
-  techie:{n:"Техник",d:"Паяльник и изолента решают половину бед. Механика и самоделки надёжнее; поломки случаются реже.",e:{turret:.3}},
-  pathfinder:{n:"Проводник",d:"Чует короткий путь и опасный. Переходы дешевле на 20%, Врата замечает раньше остальных — редко заводит отряд в тупик.",e:{travel:.2}},
+  techie:{n:"Техник",d:"+30% к прочности и урону турелей/механики отряда. Постройки с турелями заметно крепче в обороне.",e:{turret:.3}},
+  pathfinder:{n:"Проводник",d:"Переходы по карте: −20% расхода сил (стамина). Время в пути не сокращает. Меньше устаёшь на длинных маршрутах.",e:{travel:.2}},
   cook2:{civ:1,n:"Кашевар",d:"Из чего угодно варит съедобное. Еда и вода уходят на 25% медленнее (с потолком). Котелок — его аргумент.",e:{food:.25,water:.25}},
   brewer2:{civ:1,n:"Травник",d:"Знает травы и пропорции. Отвары и аптечки сильнее на 25%. Горько, зато по делу.",e:{heal2:.25}},
   scout2:{n:"Дозорный",d:"Дозор не для галочки: нападения всегда видят заранее. Редко когда «внезапно».",e:{warn:1}},
   hunter2:{n:"Загонщик",d:"Чует зверя и тварь. +10% урона отряду по тварям и зверям (не по людям и не по духам).",e:{dmgBeast:.1}},
   sapper:{n:"Сапёр",d:"Мины и ворота — его язык. Минные поля и укрепления работают вдвое лучше, пока он рядом.",e:{def:3,turret:.15}},
-  radioman:{civ:1,n:"Радист",d:"Ловит эфир и слухи. Задания и новости приносят больше кристаллов — кто-то на той стороне ещё торгует словами.",e:{trade:.1,loot:.1}},
+  radioman:{civ:1,n:"Радист",d:"+10% к торговле (покупки дешевле, продажи дороже) и +10% к добыче/материалам (как у фуражира, слабее). Чуть выше шанс ранга лута.",e:{trade:.1,loot:.1}},
   wrangler:{n:"Погонщик",d:"Твари слушаются жеста. Питомцы отряда крепче на 25% — он кормит и рычит на них одинаково убедительно.",e:{pet:.25}},
   scribe:{civ:1,n:"Писарь",d:"Ведёт записи, даже когда не просят. Ты получаешь на 15% больше опыта — разбор полётов после боя не бывает лишним.",e:{hxp:.15}},
   keeper:{civ:1,n:"Кладовщик",d:"+25 переносимого веса, еда расходуется на 15% медленнее (на воду не влияет). Суммируется с другими такими же специалистами, но не больше 40% экономии еды суммарно.",e:{carry:25,food:.15}},
@@ -2497,6 +2497,67 @@ const PET_PERK={
   boneelk:{e:{carry:18,def:6},t:"+18 веса и +6 защиты — костяной грузчик."},
   coremoth:{e:{loot:0.07},t:"+7% к находкам — тянется к эссенции."}
 };
+
+function traitEffectLabel(k){
+  const map={
+    loot:"Добыча и материалы",travel:"Переходы (−силы)",build:"Скидка на постройки",
+    trade:"Торговля",turret:"Турели (HP/урон)",pet:"Питомцы (сила)",
+    hxp:"Опыт героя",xp:"Опыт отряда",food:"Экономия еды",water:"Экономия воды",
+    heal:"Лечение после боя",heal2:"Сила отваров/аптечек",dmg:"Урон отряда",
+    dmgBeast:"Урон по тварям",stamregen:"Восстановление сил",stamsave:"Экономия сил на поиске",
+    def:"Оборона зоны",carry:"Переносимый вес",warn:"Предупреждение о нападении"
+  };
+  return map[k]||k;
+}
+function traitEffectFmt(k,v){
+  if(k==="def"||k==="carry"||k==="warn") return (v>=0?"+":"")+Math.round(v);
+  return Math.round(v*100)+"%";
+}
+function partyTraitsPanel(){
+  const people=(S.party||[]).filter(p=>!p.away);
+  if(!people.length) return `<div class="panel"><h3>Пассивки отряда</h3><div class="mut">Пока никого нет — бонусы появятся после найма спутников.</div></div>`;
+  const keys=new Set();
+  const who={};
+  people.forEach(p=>{
+    [p.trait,p.trait2].forEach(tk=>{
+      const T=TRAITS[tk]; if(!T||!T.e) return;
+      for(const k in T.e){
+        keys.add(k);
+        if(!who[k]) who[k]=[];
+        const mul=(k==="def"||k==="turret")?(p.home?1:0):(p.home?0.5:1);
+        const v=T.e[k]*mul;
+        if(v) who[k].push({n:p.n,trait:T.n,v:v,home:!!p.home});
+      }
+    });
+  });
+  const lines=[...keys].filter(k=>who[k]&&who[k].length).sort().map(k=>{
+    const raw=partyTrait(k);
+    const cap=CAPPED_TRAITS[k];
+    const effective=cap?Math.min(raw,cap.cap):raw;
+    let note="";
+    if(cap){
+      note="Потолок "+traitEffectFmt(k,cap.cap);
+      if(raw>cap.cap) note+=` · <span class="r6">сырой ${traitEffectFmt(k,raw)}, лишнее не работает</span>`;
+      else if(raw>=cap.cap*0.999) note+=` · <span class="r5">потолок достигнут</span>`;
+    } else note="Без потолка";
+    const parts=who[k].map(x=>`${esc(x.n)} (${esc(x.trait)}): ${traitEffectFmt(k,x.v)}${x.home?" · база":""}`).join("; ");
+    return `<div class="stat"><span>${traitEffectLabel(k)}<br><span class="mut" style="font-size:11px">${parts}</span></span>
+      <b>${traitEffectFmt(k,effective)}</b></div>
+      <div class="mut" style="font-size:11px;margin:-2px 0 8px">${note}</div>`;
+  }).join("");
+  const roster=people.map(p=>{
+    const ts=[p.trait,p.trait2].filter(Boolean).map(tk=>TRAITS[tk]?TRAITS[tk].n:tk).join(", ");
+    return `<div class="mut">• ${esc(p.n)}${p.home?" (база)":""}: ${ts||"—"}</div>`;
+  }).join("");
+  return `<div class="panel"><h3>Пассивки отряда</h3>
+    <div class="mut" style="margin-bottom:8px">Сумма бонусов. С тобой — полный эффект; на базе — 50% (кроме обороны зоны и турелей: они считаются только с базы).</div>
+    ${lines||'<div class="mut">Нет активных бонусов.</div>'}
+    <hr>
+    <div class="mut" style="margin-bottom:4px"><b>Черты спутников</b></div>
+    ${roster}
+  </div>`;
+}
+
 function petKey(p){ return (p&&(p.kind||p.id))||""; }
 function petRankOf(p){
   if(!p) return 0;
@@ -5488,7 +5549,7 @@ function allySheet(pi){
   const learnable=(C?C.sk:[]).filter(k=>!p.skills.includes(k));
   const cards=(S.cards||[]).filter(c=>c.t==="skill"&&!p.skills.includes(c.k));
   openModal(`<div class="portrait">${avatar(p.n,allyKind(p),72)}<div><h3 style="margin:0">${esc(p.n)}</h3>
-    <div class="mut">${clsName(p.cls)} · ур.${p.lvl}</div></div></div>
+    <div class="mut">${clsName(p.cls)} · ${genderLabel(p)} · ур.${p.lvl}</div></div></div>
     <div class="mut">${TRAITS[p.trait]?TRAITS[p.trait].n:""}
       ${p.cond?" · условие: "+CONDITIONS[p.cond].n+" · отношение "+(p.loy||50):""}</div>
     ${p.armInjury?'<div class="mut" style="color:var(--warn)">🦴 Перебита рука — не может держать двуручное оружие, пока не заживёт (ещё '+Math.max(1,4-(S.day-(p.armInjuryDay||S.day)))+' дн.).</div>':""}
@@ -9880,11 +9941,14 @@ const CLASSMOOD_TXT={
 const GENDER_F=new Set(["Найя","Кая","Ада","Ингрид","Тала","Сати","Юна","Ана","Иден",
  "Аста","Ниса","Ора","Кайра","Ирис","Нур","Мика"]);
 function genderOf(p){
+  if(!p) return "m";
+  if(p.gender==="f"||p.gender==="m") return p.gender;
   if(GENDER_F.has(p.n)) return "f";
-  const last=p.n.trim().slice(-1);
+  const last=(p.n||"").trim().slice(-1);
   if("ая".includes(last)) return "f";
   return "m";
 }
+function genderLabel(p){ return genderOf(p)==="f"?"женщина":"мужчина"; }
 function pn(p,m,f){ return genderOf(p)==="f"?f:m; }
 function moodTxt(p){ return CLASSMOOD_TXT[p.cls]||"держится тише, чем хотелось бы"; }
 const TOPICS=[
@@ -13759,7 +13823,7 @@ function vHero(){
       · лечится: ${INJ[x.k].cure==="sleep"?"сном":USABLE[INJ[x.k].cure].n}</span></span></div>`).join("")}
     <button class="btn-main" onclick="treat()">Лечиться</button></div>`:""}
     <div class="panel"><h2>${esc(S.name)}</h2>
-    <div class="mut">${clsName(S.cls)}${S.sub?" + "+clsName(S.sub):""} · ${ORIGINS.find(o=>o.k===S.org).n}
+    <div class="mut">${clsName(S.cls)}${S.sub?" + "+clsName(S.sub):""} · ${S.gender==="f"?"женщина":"мужчина"} · ${ORIGINS.find(o=>o.k===S.org).n}
     · ранг <span class="${RAR[S.rank||0].c}">${RAR[S.rank||0].n}</span></div>
     ${chips}
     <div class="mut" style="margin-top:6px">${moraleIcon()} Мораль: <b>${S.morale===undefined?50:S.morale}</b>/100 — ${moraleText()}</div>
@@ -14734,7 +14798,7 @@ function wearBlockReason(it, actor){
   if(!it) return "Нет предмета.";
   const g=actorGender(actor);
   if(it.reqGender&&it.reqGender!==g){
-    return it.reqGender==="f"?"Крой женский — не налезет.":"Крой мужской — не налезет.";
+    return it.reqGender==="f"?"Только для женщин.":"Только для мужчин.";
   }
   const a=actorAttrs(actor);
   const checks=[["reqStr","str","Сила"],["reqAgi","agi","Ловкость"],["reqEnd","end","Выносливость"],
@@ -14755,7 +14819,7 @@ function wearBlockReason(it, actor){
 function reqLine(it){
   if(!it) return "";
   const bits=[];
-  if(it.reqGender) bits.push(it.reqGender==="f"?"♀ женский крой":"♂ мужской крой");
+  if(it.reqGender) bits.push(it.reqGender==="f"?"♀ для женщин":"♂ для мужчин");
   const checks=[["reqStr","Сила"],["reqAgi","Ловкость"],["reqEnd","Выносливость"],["reqPer","Восприятие"],["reqInt","Интеллект"],["reqVit","Живучесть"]];
   checks.forEach(([k,n])=>{ if(it[k]) bits.push(n+" ≥ "+it[k]); });
   if(it.reqCls&&it.reqCls.length){
@@ -15458,7 +15522,7 @@ function vParty(){
       <div style="display:flex;gap:8px;align-items:flex-start">
       <span class="icv">${avatar(p.n,allyKind(p),44)}</span>
       <span class="nm" style="flex:1"><b>${esc(p.n)}${p.romance?" 💞":p.rom&&p.rom.stage===1?" 🌹":npcCoupleId(p.id)?" 💑":""}${p.away?(p.away.k==="garrison"?" — комендант зоны "+esc(zoneNameOf(p.away.zoneId)):" — на задании до дня "+p.away.until+(p.away.partner?" (с "+esc((S.party.find(x=>x.id===p.away.partner)||{n:"кем-то"}).n)+")":"")):(p.home?" — на базе":"")}</b>
-      <span class="mut">${clsName(p.cls)} · ур.${p.lvl}${p.trait?` · <span class="sys">${TRAITS[p.trait].n}</span>`:""}
+      <span class="mut">${clsName(p.cls)} · ${genderLabel(p)} · ур.${p.lvl}${p.trait?` · <span class="sys">${TRAITS[p.trait].n}</span>`:""}
       ${p.civ?"":` · ${Math.round(p.hp)}/${allyPower(p).hpMax} HP · урон ${allyPower(p).dmg} · защита ${allyPower(p).def}`}
       ${p.civ?"":(p.ap||p.sp)?` · <span class="r5">есть нераспределённые очки</span>`:""}</span></span></div>
       ${hasDetails?`<div onclick="event.stopPropagation()">
@@ -15606,6 +15670,7 @@ function vParty(){
       ${partyTabBtn("garage",`🚗 Гараж (${(S.garage||[]).length})`,tab==="garage")}
     </div>
   </div>
+  ${partyTraitsPanel()}
   ${body}`;
 }
 function setRow(i){
