@@ -916,59 +916,60 @@ const PERKS = {
 
 const TITLES = {
   /* базовые прогресс-титулы */
-  alive:{n:"Живой",d:"+6 макс. HP за ступень. Каждый новый день — отдельная победа.",e:{hp:6}},
-  slayer:{n:"Истребитель",d:"+7% урона за ступень. Общий счётчик убийств.",e:{dmg:.07}},
-  walker:{n:"Ходок",d:"−12% расхода сил в пути за ступень.",e:{travel:.12}},
-  hoarder:{n:"Собиратель",d:"+8% к редкости добычи за ступень.",e:{luck:.08}},
-  deep:{n:"Спустившийся",d:"+8% сопротивления порче. Побывать в Изнанке.",e:{res:.08}},
-  breaker:{n:"Разрыватель",d:"+9% урона по тварям за ступень. Закрытые разломы.",e:{dmg:.09}},
-  evolved:{n:"Эволюционировавший",d:"+10 HP за ступень. Личный ранг растёт.",e:{hp:10}},
-  gatecrash:{n:"Взломщик Врат",d:"+6% урона за ступень. Зачищенные Врата.",e:{dmg:.06}},
-  founder:{n:"Основатель",d:"+8 HP за ступень. Свои зоны и выросшие поселения.",e:{hp:8}},
-  warden2:{n:"Держащий стены",d:"+6% урона за ступень. Отбитые осады.",e:{dmg:.06}},
-  kin:{n:"Свой",d:"+8 HP за ступень. Личные истории спутников.",e:{hp:8}},
-  between:{n:"Ходящий между",d:"+7% урона за ступень. Открытые миры.",e:{dmg:.07}},
-  core:{n:"Остановивший Ядро",d:"+15% урона. Конец линии Ядра.",e:{dmg:.15}},
+  alive:{n:"Живой",d:"+6 макс. HP за ступень. Каждый новый день — отдельная победа.",e:{hp:6},grp:"progress"},
+  slayer:{n:"Истребитель",d:"+7% урона за ступень. Общий счётчик убийств.",e:{dmg:.07},grp:"progress"},
+  walker:{n:"Ходок",d:"−12% расхода сил в пути за ступень.",e:{travel:.12},grp:"progress"},
+  hoarder:{n:"Собиратель",d:"+8% к редкости добычи за ступень.",e:{luck:.08},grp:"progress"},
+  deep:{n:"Спустившийся",d:"+8% сопротивления порче. Побывать в Изнанке.",e:{res:.08},grp:"progress"},
+  breaker:{n:"Разрыватель",d:"+9% урона по тварям за ступень. Закрытые разломы.",e:{dmg:.09},grp:"progress"},
+  evolved:{n:"Эволюционировавший",d:"+10 HP за ступень. Личный ранг растёт.",e:{hp:10},grp:"progress"},
+  gatecrash:{n:"Взломщик Врат",d:"+6% урона за ступень. Зачищенные Врата.",e:{dmg:.06},grp:"progress"},
+  founder:{n:"Основатель",d:"+8 HP за ступень. Считаются и свои построенные зоны, и рост населения обжитых поселений (в т.ч. Крова) до 10+ человек — каждый, кого ты позвал к людям.",e:{hp:8},grp:"progress"},
+  warden2:{n:"Держащий стены",d:"+6% урона за ступень. Отбитые осады.",e:{dmg:.06},grp:"progress"},
+  kin:{n:"Свой",d:"+8 HP за ступень. Личные истории спутников.",e:{hp:8},grp:"progress"},
+  between:{n:"Ходящий между",d:"+7% урона за ступень. Открытые миры.",e:{dmg:.07},grp:"progress"},
+  core:{n:"Остановивший Ядро",d:"+15% урона. Конец линии Ядра.",e:{dmg:.15},grp:"progress"},
 
   /* Убийца ранга: +5/10/20/30 ко всем осн. характеристикам */
-  kill_r4:{n:"Убийца Легендарных",d:"+5 ко всем основным характеристикам. Первое убийство легендарного ранга.",e:{all:5}},
-  kill_r5:{n:"Убийца Мифических",d:"+10 ко всем основным характеристикам. Первое убийство мифического ранга.",e:{all:10}},
-  kill_r6:{n:"Убийца Древних",d:"+20 ко всем основным характеристикам. Первое убийство древнего ранга.",e:{all:20}},
-  kill_r7:{n:"Убийца Небесных",d:"+30 ко всем основным характеристикам. Первое убийство небесного ранга.",e:{all:30}},
+  kill_r4:{n:"Убийца Легендарных",d:"+5 ко всем основным характеристикам. Первое убийство легендарного ранга.",e:{all:5},grp:"killer"},
+  kill_r5:{n:"Убийца Мифических",d:"+10 ко всем основным характеристикам. Первое убийство мифического ранга.",e:{all:10},grp:"killer"},
+  kill_r6:{n:"Убийца Древних",d:"+20 ко всем основным характеристикам. Первое убийство древнего ранга.",e:{all:20},grp:"killer"},
+  kill_r7:{n:"Убийца Небесных",d:"+30 ко всем основным характеристикам. Первое убийство небесного ранга.",e:{all:30},grp:"killer"},
 
-  /* Сокрушитель: ступени 5/15/40, статы чуть выше убийцы */
-  crush_r4:{n:"Сокрушитель Легенд",d:"+6 ко всем осн. хар-кам за ступень (5 / 15 / 40 убийств легендарных).",e:{all:6}},
-  crush_r5:{n:"Сокрушитель Мифов",d:"+12 ко всем осн. хар-кам за ступень (5 / 15 / 40 мифических).",e:{all:12}},
-  crush_r6:{n:"Сокрушитель Древних",d:"+22 ко всем осн. хар-кам за ступень (5 / 15 / 40 древних).",e:{all:22}},
-  crush_r7:{n:"Сокрушитель Небесных",d:"+32 ко всем осн. хар-кам за ступень (5 / 15 / 40 небесных).",e:{all:32}},
+  /* Сокрушитель: ступени 5/15/40 убийств. Убийца уже даёт основной бонус за первое убийство,
+     поэтому Сокрушитель — небольшая прибавка сверху за упорство, а не повтор того же бонуса. */
+  crush_r4:{n:"Сокрушитель Легенд",d:"+2 ко всем осн. хар-кам за ступень (5 / 15 / 40 убийств легендарных).",e:{all:2},grp:"crusher"},
+  crush_r5:{n:"Сокрушитель Мифов",d:"+2 ко всем осн. хар-кам за ступень (5 / 15 / 40 мифических).",e:{all:2},grp:"crusher"},
+  crush_r6:{n:"Сокрушитель Древних",d:"+2 ко всем осн. хар-кам за ступень (5 / 15 / 40 древних).",e:{all:2},grp:"crusher"},
+  crush_r7:{n:"Сокрушитель Небесных",d:"+2 ко всем осн. хар-кам за ступень (5 / 15 / 40 небесных).",e:{all:2},grp:"crusher"},
 
-  david:{n:"Давид",d:"Удача растёт с максимальным разрывом рангов, который ты закрыл в бою.",e:{luck:.04}},
-  lucky:{n:"Везунчик",d:"+2 Удачи и +7% к эффективной удаче за ступень. Выжил на грани или одолел сильно превосходящего.",e:{lck:2,luck:.07}},
+  david:{n:"Давид",d:"Удача растёт с максимальным разрывом рангов, который ты закрыл в бою.",e:{luck:.04},grp:"luck"},
+  lucky:{n:"Везунчик",d:"+2 Удачи и +7% к эффективной удаче за ступень. Выжил на грани или одолел сильно превосходящего.",e:{lck:2,luck:.07},grp:"luck"},
 
   /* Убийца вида: опыт/лут только с этого типа (см. typeKillBonus) */
-  type_beast:{n:"Убийца тварей",d:"Больше опыта и лута только с зверей и тварей. 1000 / 5000 / 10000.",e:{}},
-  type_man:{n:"Убийца людей",d:"Больше опыта и лута только с людей. 1000 / 5000 / 10000.",e:{}},
-  type_rift:{n:"Убийца Шва",d:"Больше опыта и лута только с порождений Разлома. 1000 / 5000 / 10000.",e:{}},
+  type_beast:{n:"Убийца тварей",d:"Больше опыта и лута только с зверей и тварей. 1000 / 5000 / 10000.",e:{},grp:"hunter"},
+  type_man:{n:"Убийца людей",d:"Больше опыта и лута только с людей. 1000 / 5000 / 10000.",e:{},grp:"hunter"},
+  type_rift:{n:"Убийца Шва",d:"Больше опыта и лута только с порождений Разлома. 1000 / 5000 / 10000.",e:{},grp:"hunter"},
 
   /* Личный ранг — только с легендарного, те же цифры что у Убийцы */
-  rank_legend:{n:"Стал Легендой",d:"+5 ко всем основным характеристикам. Личный ранг «Легендарный».",e:{all:5}},
-  rank_myth:{n:"Стал Мифом",d:"+10 ко всем основным характеристикам. Личный ранг «Мифический».",e:{all:10}},
-  rank_ancient:{n:"Стал Древним",d:"+20 ко всем основным характеристикам. Личный ранг «Древний».",e:{all:20}},
-  rank_heaven:{n:"Стал Небесным",d:"+30 ко всем основным характеристикам. Личный ранг «Небесный».",e:{all:30}},
+  rank_legend:{n:"Стал Легендой",d:"+5 ко всем основным характеристикам. Личный ранг «Легендарный».",e:{all:5},grp:"rank"},
+  rank_myth:{n:"Стал Мифом",d:"+10 ко всем основным характеристикам. Личный ранг «Мифический».",e:{all:10},grp:"rank"},
+  rank_ancient:{n:"Стал Древним",d:"+20 ко всем основным характеристикам. Личный ранг «Древний».",e:{all:20},grp:"rank"},
+  rank_heaven:{n:"Стал Небесным",d:"+30 ко всем основным характеристикам. Личный ранг «Небесный».",e:{all:30},grp:"rank"},
 
   /* Тормоза: ступень по уровню первого взятия; усиливают способности/класс */
-  skill_brake:{n:"Способный Тормоз",d:"Чем позже взял первую способность (10 / 20 / 30 ур.), тем сильнее все умения.",e:{skPow:.08}},
-  class_brake:{n:"Классовый Тормоз",d:"Чем позже взял первый класс (15 / 25 / 35 ур.), тем глубже впитывается школа класса.",e:{clsPow:.08}},
+  skill_brake:{n:"Способный Тормоз",d:"Чем позже взял первую способность (10 / 20 / 30 ур.), тем сильнее все умения.",e:{skPow:.08},grp:"brake"},
+  class_brake:{n:"Классовый Тормоз",d:"Чем позже взял первый класс (15 / 25 / 35 ур.), тем глубже впитывается школа класса.",e:{clsPow:.08},grp:"brake"},
 
-  juggernaut:{n:"Джаггернаут",d:"+10 макс. HP за ступень. Часто заканчиваешь бой с большим запасом здоровья.",e:{hp:10}},
-  berserk:{n:"Берсерк",d:"+8% урона за ступень. Добивания, пока сам на низком HP.",e:{dmg:.08}},
-  masochist:{n:"Мазохист",d:"+6% защиты за ступень (действует постоянно). Не раз уходил с 1 HP.",e:{def:.06}},
-  hamster:{n:"Хомяк",d:"Вдвое медленнее износ снаряжения, +12 к переносимому весу за ступень. Держишь много вещей высокого ранга.",e:{dur:1,carry:12}},
-  overcomer:{n:"Превозмогатель",d:"+7% урона за ступень против более сильных по уровню.",e:{dmg:.07}},
-  host:{n:"Хозяин",d:"+6% к силе питомцев за ступень. Пороги по числу питомцев.",e:{pet:0.06}},
-  commander:{n:"Командир",d:"+5% к силе отряда и наёмников за ступень. Пороги по числу своих.",e:{ally:0.05}},
-  bossbane:{n:"Убийца имеющих имя",d:"Больше опыта и лута с боссов и именованных. 1 / 10 / 100.",e:{}},
-  elitebane:{n:"Охотник на элиту",d:"Больше опыта и лута с элитных. 1 / 10 / 100.",e:{}}
+  juggernaut:{n:"Джаггернаут",d:"+10 макс. HP за ступень. Часто заканчиваешь бой с большим запасом здоровья.",e:{hp:10},grp:"special"},
+  berserk:{n:"Берсерк",d:"+8% урона за ступень. Добивания, пока сам на низком HP.",e:{dmg:.08},grp:"special"},
+  masochist:{n:"Мазохист",d:"+6% защиты за ступень (действует постоянно). Не раз уходил с 1 HP.",e:{def:.06},grp:"special"},
+  hamster:{n:"Хомяк",d:"Вдвое медленнее износ снаряжения, +12 к переносимому весу за ступень. Держишь много вещей высокого ранга.",e:{dur:1,carry:12},grp:"special"},
+  overcomer:{n:"Превозмогатель",d:"+7% урона за ступень против более сильных по уровню.",e:{dmg:.07},grp:"special"},
+  host:{n:"Хозяин",d:"+6% к силе питомцев за ступень. Пороги по числу питомцев.",e:{pet:0.06},grp:"special"},
+  commander:{n:"Командир",d:"+5% к силе отряда и наёмников за ступень. Пороги по числу своих.",e:{ally:0.05},grp:"special"},
+  bossbane:{n:"Убийца имеющих имя",d:"Больше опыта и лута с боссов и именованных. 1 / 10 / 100.",e:{},grp:"hunter"},
+  elitebane:{n:"Охотник на элиту",d:"Больше опыта и лута с элитных. 1 / 10 / 100.",e:{},grp:"hunter"}
 };
 
 const ITEMBASE = [
@@ -1497,6 +1498,13 @@ const USABLE = {
     d:"Аптечка расширенная: жгут, бинты, ампула. Сильное лечение."},
   smelling:{n:"Нашатырь",ic:"💨",stam:25,
     d:"Резкий запах. Поднимает на ноги, когда силы на нуле."},
+  /* ---- процентные восстановители (System-инъекции, для высоких уровней) ---- */
+  regenkit:{n:"Набор регенерации",ic:"🧬",healPct:0.35,
+    d:"Плотная System-инъекция. Восстанавливает 35% максимального здоровья — не теряет силу с ростом персонажа, в отличие от обычных аптечек."},
+  vigorcore:{n:"Концентрат сил",ic:"🧪",stamPct:0.35,
+    d:"Вытяжка чистой выносливости. Восстанавливает 35% максимального запаса сил — масштабируется вместе с тобой."},
+  ethercore:{n:"Эфирный конденсат",ic:"🔷",enPct:0.35,
+    d:"Сгущённый эфир System-плотности. Восстанавливает 35% максимального запаса эфира — масштабируется вместе с тобой."},
   /* ---- полевые расходники ---- */
   torchfuel:{n:"Масло для факела",ic:"🪔",mat:1,
     d:"Тратится при зажигании факела (1 масло = 1 розжиг). Без масла можно спичками."},
@@ -2072,7 +2080,7 @@ function mapNotePrompt(id){
     </div>`);
 }
 function blackGearPrice(it){
-  return Math.round((60+itemScore(it)*7)*1.25);
+  return Math.round(40+itemScore(it)*4);
 }
 function blackGearStock(){
   if(S.bmDay!==S.day||!(S.bmStock||[]).length){
@@ -2090,12 +2098,15 @@ function blackGearStock(){
 }
 function blackMarket(fromTemp){
   const heat=S.wanted&&S.wanted.heat||0;
-  const mult=1.15+(heat>30?0.1:0);
-  const goods=[["stimpack",8],["grenade",10],["emp",14],["essence",16],["oblivion",45],["spark",22],["fuel",7],["parts",9]];
+  const mult=1.05+(heat>30?0.05:0);
+  const goods=[["stimpack",8],["grenade",10],["emp",14],["essence",16],["oblivion",45],["spark",22],["fuel",7],["parts",9],
+    ["regenkit",30],["vigorcore",30],["ethercore",30]];
   const gearList=blackGearStock();
   openModal(`<h3>🕶 Чёрный рынок</h3>
     <div class="mut">${fromTemp?"Временные палатки. ":"Тихий угол. "}Без документов, с наценкой. Шум и розыск здесь не любят — но запоминают лица.</div>
+    <div class="mut" style="font-size:12px">Здесь только <b>покупка</b> за кристаллы — сдать вещи на продажу можно у обычного торговца.</div>
     <div class="mut">💠 ${S.tok}</div>
+    <h3 style="margin-top:8px">Купить</h3>
     <div class="row" style="flex-wrap:wrap">${goods.map(([id,p])=>{
       const pr=Math.round(p*mult);
       return `<button onclick="buyBlack('${id}',${pr})">${USABLE[id]?USABLE[id].ic:""} ${USABLE[id]?USABLE[id].n:id}<br><span class="mut">${pr} 💠</span></button>`;
@@ -2121,7 +2132,7 @@ function buyBlack(id,p){
 }
 function buyBlackGear(idx){
   const list=blackGearStock(); const it=list[idx]; if(!it) return;
-  const heat=S.wanted&&S.wanted.heat||0, mult=1.15+(heat>30?0.1:0);
+  const heat=S.wanted&&S.wanted.heat||0, mult=1.05+(heat>30?0.05:0);
   const p=Math.round(blackGearPrice(it)*mult);
   if(S.tok<p) return toast2("Не хватает кристаллов.");
   S.tok-=p; S.inv.push(it); S.found++;
@@ -3558,6 +3569,18 @@ function log(t,cls){ S.log=S.log||[]; S.log.unshift({t,c:cls||""}); if(S.log.len
 function sysmsg(t){ log(t,"sys");
   S.chron=S.chron||[]; S.chron.unshift({d:S.day,t}); if(S.chron.length>120) S.chron.pop(); }
 
+function injFoodMult(){
+  // Дизентерия удваивает расход и еды, и воды; паразиты — только еды.
+  let m=1;
+  if(hasInj("dysentery")) m+=1;
+  if(hasInj("parasite")) m+=0.5;
+  return m;
+}
+function injWaterMult(){
+  let m=1;
+  if(hasInj("dysentery")) m+=1;
+  return m;
+}
 function passTime(h){
   if(S.dg&&S.dg.type==="deep") h=h*3;
   for(let i=0;i<h;i++){
@@ -3566,7 +3589,7 @@ function passTime(h){
     if(S.torch&&!isNight()){ S.torch=false; sysmsg("Рассвет. Факел гаснет — днём он только выдаёт тебя."); }
     S.noise=clamp((S.noise||0)-(isSafe(S.at)?7:3),0,100);
     const fr=((S.org==="far")?0.7:1)*(wIs("frost")?1.4:1)*(hasUq("u_ration")?0.5:1)
-      *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12);
+      *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12)*injFoodMult();
     S.food=clamp(S.food-1.1*fr,0,100);
     if(S.pets&&S.pets.length){
       S.pets.forEach(p=>{ p.hunger=Math.max(0,(p.hunger===undefined?100:p.hunger)-1.5); });
@@ -3575,7 +3598,7 @@ function passTime(h){
       sysmsg("Голодно. На карте есть «Искать воду» и «Искать еду» — они дают немного, но всегда. "
         +"В поселении можно поработать за паёк, а в квартирах и магазинах почти всегда есть чем поживиться."
         +(combatParty().length?" С тобой идут люди — они тоже едят, так что расход больше твоего личного.":"")); }
-    S.water=clamp(S.water-1.6*(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1)*(typeof dayModWaterMult==="function"?dayModWaterMult():1),0,100);
+    S.water=clamp(S.water-1.6*(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1)*(typeof dayModWaterMult==="function"?dayModWaterMult():1)*injWaterMult(),0,100);
     combatParty().forEach(p=>{ p.fatigue=Math.min(100,(p.fatigue||0)+0.5); });
     if(wIs("rain")&&Math.random()<0.15) S.water=clamp(S.water+2,0,100);
     if(S.food<=0||S.water<=0){ S.hp=clamp(S.hp-3,0,9999);
@@ -3836,7 +3859,7 @@ const MINI_EV=[
       const kk=rollSkillKey()||"hack"; const c=mkCard("skill",kk,rnd(1,3)); S.cards.push(c); noteCard(c);
       openModal(`<div class="syswin"><div class="t">${esc(n.n)} · ЭХО</div>
         На секунду перед глазами вспыхивает строка, которой тут быть не должно — как подсказка из чужого меню.
-        Опыт +${xp}. Карта: ${esc(cardName(c))}.</div>
+        Опыт +${xp}. Карта: <span class="${RAR[c.r||0].c}">${esc(cardName(c))}</span> <span class="mut">— ${RAR[c.r||0].n}</span>.</div>
         <button class="btn-main" onclick="closeModal()">Дальше</button>`,true); }},
   {k:"quiet",n:"Странная тишина",d:"Даже заражение будто притихло.",
     run:(n)=>{ S.st=clamp(S.st+12,0,derive(S).stMax); S.nodes[n.id].inf=Math.max(0,(S.nodes[n.id].inf||0)-8);
@@ -4204,7 +4227,7 @@ function cardChoice(n,rmin){
     sysmsg("Карта взята: "+cardName(opts[i])+"."); closeModal(); render(); save(); };
   window["_skipCards"]=()=>{ sysmsg("Карты отклонены. Можно подождать более сильных — или не брать вовсе."); closeModal(); render(); save(); };
   openModal(`<div class="syswin"><div class="t">ВЫБОР КАРТЫ</div>
-    Система предлагает несколько. Можно взять одну — или <b>отказаться</b> (остальные рассыпаются). Отказ имеет смысл, если копишь «Тормоз».</div>
+    Система предлагает несколько. Можно взять одну — или <b>отказаться</b> (остальные рассыпаются).${(S.titles&&S.titles.length)?" Отказ имеет смысл, если копишь «Тормоз».":""}</div>
     ${opts.map((c,i)=>`<button class="item ${RAR[c.r].b}" onclick="_pick(${i})">
       <span class="ic">${c.t==="class"?"🎴":"🃏"}</span>
       <span class="nm"><b class="${RAR[c.r].c}">${esc(cardName(c))}</b>
@@ -4610,6 +4633,23 @@ function evoTree(){
   svg+=`</svg>`;
   return svg;
 }
+function rankGrowthBlock(){
+  const rank=S.rank||0;
+  const rows=[];
+  for(let i=0;i<rank;i++){
+    const p=(S.evoPath||[])[i];
+    const pd=p?EVOPATH[p]:null;
+    rows.push(`<div class="stat"><span><b class="${RAR[i+1].c}">${RAR[i+1].n}</b></span>
+      <b style="font-weight:normal;font-size:12px">+8% ко всем показателям${pd?" · "+esc(pd.n)+": "+esc(pd.d):""}</b></div>`);
+  }
+  const nextRow=rank<7?`<div class="stat" style="opacity:.8"><span>Следующий: <b class="${RAR[rank+1].c}">${RAR[rank+1].n}</b></span>
+    <b style="font-weight:normal;font-size:12px">+8% ко всем показателям (станет +${(rank+1)*8}% суммарно) · направление эволюции выбирается при повышении</b></div>`:"";
+  return `<div class="panel"><h3>Что даёт ранг</h3>
+    <div class="mut" style="font-size:12px;margin-bottom:6px">Каждая ступень — плюс 8% к урону, защите, здоровью и эфиру, а ещё раз в две ступени — слот способности. Направление эволюции выбирается один раз за ступень и остаётся навсегда.</div>
+    ${rows.length?rows.join(""):'<div class="mut">Ранг пока обычный — эволюций ещё не было.</div>'}
+    ${nextRow}
+    </div>`;
+}
 function evolve(){
   if(S.rank>=7) return toast("Небесный ранг — предел.");
   const c0=EVOCOST[S.rank];
@@ -4685,7 +4725,7 @@ const TITLE_HOWTO={
   breaker:{track:"Разломов закрыто",val:s=>s.rifts},
   evolved:{track:"Личный ранг",val:s=>s.rank||0},
   gatecrash:{track:"Врат зачищено",val:s=>s.gatesDone||0},
-  founder:{track:"Зоны и поселения",val:s=>(typeof zoneCount==="function"?zoneCount():0)+Object.values(s.hubs||{}).filter(h=>h.found&&h.pop>=10).length},
+  founder:{track:"Свои зоны + поселения с населением 10+ (Кров растёт от каждого, кого зовёшь к людям)",val:s=>(typeof zoneCount==="function"?zoneCount():0)+Object.values(s.hubs||{}).filter(h=>h.found&&h.pop>=10).length},
   warden2:{track:"Осад отбито",val:s=>(s.stat&&s.stat.siegeWon)||0},
   kin:{track:"Историй спутников",val:s=>(s.party||[]).filter(p=>p.pq&&p.pq.done).length},
   between:{track:"Миров открыто",val:s=>Object.keys(s.worlds||{}).length},
@@ -4968,6 +5008,20 @@ function farJourneyEnd(){
   log("Дошёл до места: "+nodeById(S.at).n+".");
   render(); save();
 }
+function estimateTravel(to){
+  const D=dist(S.at,to);
+  let wm=hasUq("u_scarf")?1:(wIs("storm")?1.5:wIs("rain")?1.2:wIs("frost")?1.25:1);
+  if(crisisIs("storm")) wm*=1.35;
+  const usingVeh=vehOK();
+  const V=usingVeh?vehOf(S.veh.t):null;
+  let cost=Math.round(D*0.9*wm*(hasUq("u_compass")?0.7:1)*(hasUq("u_boots")?0.5:1)
+    *(hasInj("sprain")||hasInj("frac")?1.4:1)
+    *(1-Math.min(0.4,partyTrait("travel")))*(V?V.st:1)),
+    hrs=Math.max(1,Math.round(D/9*(wIs("storm")?1.4:1)*(hasInj("sprain")||hasInj("frac")?1.3:1)*(V?V.spd:1)));
+  S.titles.forEach(t=>{const e=TITLES[t]&&TITLES[t].e; if(e&&e.travel) cost=Math.round(cost*(1-e.travel));});
+  try{ const sm=seasonTravelMult(); cost=Math.round(cost*sm.st); hrs=Math.max(1,Math.round(hrs*sm.hrs)); }catch(e){}
+  return {cost,hrs};
+}
 function travel(to,opt){
   opt=opt||{};
   if(!tutAllow("travel")) return toast("Рано уходить. Сначала сделай то, что просит Система.");
@@ -4982,21 +5036,12 @@ function travel(to,opt){
         <button onclick="closeModal()">Остаться</button>
       </div>`,true);
   }
-  const d=derive(S), D=dist(S.at,to);
-  let wm=hasUq("u_scarf")?1:(wIs("storm")?1.5:wIs("rain")?1.2:wIs("frost")?1.25:1);
-  if(crisisIs("storm")) wm*=1.35;
+  let {cost,hrs}=estimateTravel(to);
   const usingVeh=vehOK();
   const V=usingVeh?vehOf(S.veh.t):null;
-  let cost=Math.round(D*0.9*wm*(hasUq("u_compass")?0.7:1)*(hasUq("u_boots")?0.5:1)
-    *(hasInj("sprain")||hasInj("frac")?1.4:1)
-    *(1-Math.min(0.4,partyTrait("travel")))*(V?V.st:1)),
-    hrs=Math.max(1,Math.round(D/9*(wIs("storm")?1.4:1)*(hasInj("sprain")||hasInj("frac")?1.3:1)*(V?V.spd:1)));
-  S.titles.forEach(t=>{const e=TITLES[t]&&TITLES[t].e; if(e&&e.travel) cost=Math.round(cost*(1-e.travel));});
   if(opt.detour){ cost=Math.round(cost*1.35); hrs=Math.max(hrs+1,Math.round(hrs*1.3)); }
   if(S.st<cost){ toast("Слишком мало сил. Нужно "+cost+", есть "+Math.round(S.st)+"."); return; }
   const from=S.at;
-  // сезон: чуть тяжелее зимой
-  try{ const sm=seasonTravelMult(); cost=Math.round(cost*sm.st); hrs=Math.max(1,Math.round(hrs*sm.hrs)); }catch(e){}
   S.st-=cost; S.at=to; S.trips++; stat("travels"); stat("hours",hrs);
   const hab=notePath(from,to);
   if(hab>=4&&Math.random()<0.12){
@@ -5776,7 +5821,9 @@ function allyPower(p){
       else a[st]=(a[st]||0)+it.st[st];
     }
   }
-  const mul=1+(_cmd||0)*0.05;
+  const rk=typeof p.rank==="number"?p.rank:lvRank(p.lvl);
+  const rankMul=1+rk*0.04; // пассивка ранга: чем круче был пленный/боец, тем выше прибавка
+  const mul=(1+(_cmd||0)*0.05)*rankMul;
   return {
     a,
     dmg:Math.round((6+a.str*0.8+a.agi*0.3+p.lvl*1.2+dmg)*mul),
@@ -5833,6 +5880,7 @@ function allySheet(pi){
       <button onclick="givePack(${pi})">Припасы</button>
       <button class="btn-danger" onclick="releaseAllyMenu(${pi})">Отпустить</button>
     </div>
+    <div class="mut">Пассивка ранга (${RAR[typeof p.rank==="number"?p.rank:lvRank(p.lvl)].n}): +${Math.round((typeof p.rank==="number"?p.rank:lvRank(p.lvl))*4)}% к урону, защите и здоровью.</div>
     <hr><h3>Характеристики${p.ap?` <span class="r5">· свободно ${p.ap}</span>`:""}</h3>
     ${p.ap?`<div class="row" style="margin-bottom:6px">
       <button onclick="allyAutoSpend(${pi})">Распределить по классу</button></div>`:""}
@@ -5851,7 +5899,7 @@ function allySheet(pi){
         <span class="mut">${slotNames[k]}${it&&it.dmg?" · урон "+it.dmg:""}${it&&it.def?" · защита "+it.def:""}</span></span></button>`;}).join("")}
     <hr><h3>Способности (${(p.slotted||[]).length}/${allySlots(p)} в слотах)${p.sp?` · <span class="r5">очков ${p.sp}</span>`:""}</h3>
     ${p.skills.map(k=>{const on=(p.slotted||[]).includes(k), I=skInfo(k)||{n:k,d:""};
-      return `<button class="item ${on?"bd2":""}" onclick="allySlot(${pi},'${k}')">
+      return `<button class="item ${on?"bd2":""}" onclick="allySkillDetail(${pi},'${k}')">
         <span class="ic">${on?"⚡":"○"}</span><span class="nm"><b class="${on?"r2":""}">${I.n}</b>
         <span class="mut">${I.d}</span></span></button>`;}).join("")||'<div class="mut">Нет способностей.</div>'}
     ${p.sp&&learnable.length?`<hr><h3>Изучить (класс)</h3>
@@ -5883,6 +5931,20 @@ function allySlot(pi,k){
   else if(p.slotted.length>=allySlots(p)) return toast2("Все слоты заняты.");
   else if(skDef(k)) p.slotted.push(k);
   allySheet(pi); save();
+}
+function allySkillDetail(pi,k){
+  const p=S.party[pi]; if(!p) return;
+  const on=(p.slotted||[]).includes(k);
+  const I=skInfo(k)||{n:k,d:""};
+  const sd=skDef(k);
+  openModal(`<h3>${esc(I.n)}</h3>
+    <div class="mut" style="margin-top:8px">${esc(I.d)}</div>
+    ${sd&&sd.c?`<div class="mut" style="margin-top:6px">Стоимость: ${sd.c} эфира${sd.cd?" · откат "+sd.cd+" с":""}</div>`:""}
+    <hr>
+    <div class="row">
+      <button class="btn-main" onclick="allySlot(${pi},'${k}');allySkillDetail(${pi},'${k}')">${on?"Убрать из слота":"Поставить в слот"}</button>
+      <button onclick="allySheet(${pi})">Назад к спутнику</button>
+    </div>`);
 }
 function allyLearn(pi,k){
   const p=S.party[pi]; if(!p.sp) return toast2("Нет очков навыка.");
@@ -5951,7 +6013,7 @@ function equipAlly(pi,uid,slot){
   let sl=slot||it.s;
   if(it.s==="wpn"){
     if(twoHanded(it)){
-      if(p.eq.wpn) S.inv.push(p.eq.wpn);
+      if(p.eq.wpn){ S.inv.push(p.eq.wpn); p.eq.wpn=null; }
       if(p.eq.wpn2){ S.inv.push(p.eq.wpn2); p.eq.wpn2=null; }
       sl="wpn";
     } else if(sl==="wpn2"&&twoHanded(p.eq.wpn)){ S.inv.push(p.eq.wpn); p.eq.wpn=null; }
@@ -7119,7 +7181,8 @@ function endBattle(win){
         <button class="btn-main" onclick="closeModal()">Дальше</button>`,true)),500);
     }
   } }
-  CBT.prisoners=CBT.units.filter(u=>u.surr&&(u.orig||u.side)==="e").map(p=>({n:p.n,lv:p.lv,ft:p.ft}));
+  CBT.prisoners=CBT.units.filter(u=>u.surr&&(u.orig||u.side)==="e").map(p=>({n:p.n,lv:p.lv,ft:p.ft,
+    rank:foeRank({lv:p.lv,elite:p.elite,boss:p.boss,named:p.named,rank:p.rank})}));
   const foes=CBT.units.filter(u=>(u.orig||u.side)==="e"&&!u.summon);
   let rew="";
   if(win){
@@ -7437,21 +7500,21 @@ function prisonerScene(list){
       if((S.wanted&&S.wanted.heat>0)) addHeat(-Math.round(S.wanted.heat*0.5),"Слух о том, что ты отпустил сдавшихся, идёт быстрее слуха о розыске.",{court:true});
       if(Math.random()<0.35) echoAdd("raider_back",rnd(4,9));
       return "Они уходят, не оборачиваясь и не благодаря. Один всё же бросает: «Мы это запомним»."; }],
-    ["Взять откуп и отпустить",()=>{ const t=rnd(25,55);
-      const wb=pick(ITEMBASE.filter(b=>b.lv<=S.lvl+2));
-      let g=[];
-      if(wb&&Math.random()<0.5){ const it=mkItem(wb,lootRankRoll(lvRank(S.lvl),extraRank()),Math.max(1,S.lvl)); S.inv.push(it); g=[it]; }
+    ["Взять откуп и отпустить",()=>{ let t=0; const g=[];
+      list.forEach(()=>{ t+=rnd(25,55);
+        const wb=pick(ITEMBASE.filter(b=>b.lv<=S.lvl+2));
+        if(wb&&Math.random()<0.5){ const it=mkItem(wb,lootRankRoll(lvRank(S.lvl),extraRank()),Math.max(1,S.lvl)); S.inv.push(it); g.push(it); } });
       S.tok+=t; repShift("krov",1);
       loyAll(-1,"мы отпустили сдавшихся за откуп",p=>p.cond==="nokill");
       moraleShift(1,"взял откуп вместо крови");
       if(Math.random()<0.3) echoAdd("raider_back",rnd(4,9));
       return "Они сами суют тебе кристаллы"+(g.length?" и кое-что из вещей":"")+" — лишь бы разойтись живыми, не дожидаясь, что ты решишь. Забираешь, отпускаешь. (Кристаллов +"+t+".)"
         +(g.length?"<div class='syswin'>"+g.map(lootLine).join("")+"</div>":""); }],
-    ["Обыскать и отпустить",()=>{ const t=rnd(10,30);
-      const wb=pick(ITEMBASE.filter(b=>b.s==="wpn"&&b.lv<=S.lvl+2));
-      let g;
-      if(wb){ const it=mkItem(wb,lootRankRoll(lvRank(S.lvl),extraRank()),Math.max(1,S.lvl)); S.inv.push(it); g=[it]; }
-      else g=[genLoot(CBT.node||nodeById(S.at),derive(S),lootRankRoll(lvRank(S.lvl),extraRank()))];
+    ["Обыскать и отпустить",()=>{ let t=0; const g=[];
+      list.forEach(()=>{ t+=rnd(10,30);
+        const wb=pick(ITEMBASE.filter(b=>b.s==="wpn"&&b.lv<=S.lvl+2));
+        if(wb){ const it=mkItem(wb,lootRankRoll(lvRank(S.lvl),extraRank()),Math.max(1,S.lvl)); S.inv.push(it); g.push(it); }
+        else g.push(genLoot(CBT.node||nodeById(S.at),derive(S),lootRankRoll(lvRank(S.lvl),extraRank()))); });
       S.tok+=t; repShift("krov",0);
       loyAll(-2,"мы обобрали пленных",p=>p.cond==="nokill");
       return "Забираешь оружие и кристаллы, остальное оставляешь. Идти им теперь долго и налегке. (Кристаллов +"+t+".)"
@@ -7487,23 +7550,39 @@ function prisonerScene(list){
       return (isCult?"Дети Шва принимают смерть спокойно, почти с облегчением — как будто именно этого и ждали. ":"Никто не сопротивляется. С тел остаётся больше, чем стоило бы.")
         +"<div class='syswin'>"+g.map(lootLine).join("")+"</div>"; }],
     ["Предложить пойти с тобой"+(!capOk?" (нет места в отряде)":!chaOk?` (нужна Харизма 10, сейчас ${chaEff()})`:""),()=>{
-      if(!capOk) return "В отряде нет места, и они это видят.";
-      if(!chaOk) return "Тебе не хватает харизмы, чтобы его уговорить.";
-      const nm=pick(MERCNAMES), lv=Math.max(1,(one.lv||S.lvl)-1);
-      S.party.push({id:"pr"+uid(),n:nm,cls:pick(["war","gun","sco","bru"]),lvl:lv,xp:0,
-        hp:50+lv*12,hpMax:50+lv*12,dmg:9+lv*3,def:5+lv,
-        d:"Сдался в бою и предпочёл идти с тобой, а не в землю.",trait:pick(Object.keys(TRAITS)),
-        civ:0,home:0,items:{},script:[],pq:{stage:0,prog:0},loy:35,cond:pick(Object.keys(CONDITIONS))});
-      allyInit(S.party[S.party.length-1]);
-      loyAll(-3,"мы взяли к себе вчерашнего врага",p=>p.cond==="nokill");
-      stat("recruited");
+      let slots=capCombat()-(S.party||[]).filter(p=>!p.civ).length;
+      if(slots<=0) return "В отряде нет места, и они это видят.";
+      if(!chaOk) return "Тебе не хватает харизмы, чтобы их уговорить.";
+      const joined=[], refused=[], noRoom=[];
+      list.forEach(p=>{
+        const pCult=p.ft==="cult";
+        if(slots<=0){ noRoom.push(p.n); return; }
+        const joinChance=clamp(0.35+(chaEff()-10)*0.03-(pCult?0.3:0),0.15,0.85);
+        if(Math.random()>joinChance){ refused.push(p.n); return; }
+        const nm=pick(MERCNAMES), lv=Math.max(1,(p.lv||S.lvl)-1), pr=Math.max(0,p.rank||0);
+        S.party.push({id:"pr"+uid(),n:nm,cls:pick(["war","gun","sco","bru"]),lvl:lv,xp:0,
+          hp:50+lv*12,hpMax:50+lv*12,dmg:9+lv*3,def:5+lv,rank:pr,
+          d:"Сдался в бою и предпочёл идти с тобой, а не в землю."+(pr>0?" Крутой боец — таких голыми руками не берут.":""),
+          trait:pick(Object.keys(TRAITS)),
+          civ:0,home:0,items:{},script:[],pq:{stage:0,prog:0},loy:35,cond:pick(Object.keys(CONDITIONS))});
+        allyInit(S.party[S.party.length-1]);
+        stat("recruited");
+        joined.push(nm+" (был "+p.n+")");
+        slots--;
+      });
+      if(joined.length) loyAll(-3,"мы взяли к себе вчерашнего врага",p=>p.cond==="nokill");
       checkTitles(); achvCheck();
-      return nm+" поднимается, отряхивается и берёт своё оружие обратно. Доверия к тебе у него пока мало.";
+      let out=[];
+      if(joined.length) out.push((joined.length>1?"Идут с тобой: ":"С тобой идёт ")+esc(joined.join(", "))+".");
+      if(refused.length) out.push(esc(refused.join(", "))+(refused.length>1?" мотают головой":" мотает головой")+": доверия к тебе мало.");
+      if(noRoom.length) out.push("Места в отряде больше нет — "+esc(noRoom.join(", "))+" остаются стоять.");
+      return out.join("<br>");
     },!chaOk||!capOk]
   ];
+  const names=list.map(p=>esc(p.n)+((p.rank||0)>0?` <span class="${RAR[p.rank].c}">[${RAR[p.rank].n}]</span>`:""));
   openModal(`<div class="syswin" style="border-color:var(--warn)">
     <div class="t" style="color:var(--warn)">СДАВШИЕСЯ${isCult?" · ДЕТИ ШВА":""}</div>
-    ${list.length>1?"Их "+list.length+". Стоят на коленях, руки на затылке.":esc(one.n)+" стоит на коленях, руки на затылке."}
+    ${list.length>1?"Их "+list.length+": "+names.join(", ")+". Стоят на коленях, руки на затылке.":names[0]+" стоит на коленях, руки на затылке."}
     Оружие лежит в стороне. ${isCult?"Они смотрят на тебя без страха — скорее с любопытством.":"Они смотрят на тебя и ждут."}</div>
     ${window[key].map((o,i)=>`<button style="width:100%;margin:6px 0 0" ${o[2]?"disabled":""}
       onclick="resolveChoice('${key}',${i})">${esc(o[0])}</button>`).join("")}`,true);
@@ -9275,7 +9354,7 @@ const SURV=[
       return "Он отдаёт тебе одного из своих: "+p.n+"."; }],
      ["Обменять эссенцию на карту",()=>{ if(matQ("essence")<2) return "У тебя нет двух эссенций.";
       takeMat("essence",2); const c=mkCard("skill",pick(Object.keys(SKILLS)),rnd(2,4)); S.cards.push(c); noteCard(c);
-      return "Обмен состоялся: "+cardName(c)+"."; }]]},
+      return "Обмен состоялся: <span class=\""+RAR[c.r||0].c+"\">"+esc(cardName(c))+"</span> <span class=\"mut\">— "+RAR[c.r||0].n+"</span>."; }]]},
  {id:"hmur",n:"Хмурый",d:"Стоит посреди дороги с ружьём и очень плохим настроением.",
   a:[["Разойтись миром (Харизма)",()=>{ if(chaEff()>=12||Math.random()<0.4){ gainXp(40);
       return "Он опускает ствол и уходит в сторону, не поворачиваясь спиной."; }
@@ -9295,7 +9374,7 @@ const FIRSTMEET=[
  {id:"fm_pet",t:"Скулёж под машиной",
   d:"Под перевёрнутой легковушкой кто-то дышит. Мелкий, живой и не из шва.",
   a:[["Вытащить",()=>{ const p=pick(PETS); S.pets.push(mkPetFromDef(p));
-      return "Из-под машины выбирается "+p.n.toLowerCase()+". Теперь идёт за тобой."; }],
+      return "Из-под машины выбирается "+p.n.toLowerCase()+" ("+RAR[p.r||0].n+"). Теперь идёт за тобой."; }],
     ["Оставить еду и уйти",()=>{ const m=S.inv.find(i=>i.use==="cans"||i.use==="bread");
       if(m){ m.q--; if(m.q<=0) S.inv=S.inv.filter(i=>i!==m); }
       gainXp(30); return "Ты оставляешь еду рядом и уходишь."; }]]},
@@ -10108,7 +10187,8 @@ const SKILL_FLAVOR={
   curse:["Слова, от которых кожа зудит.","Проклятие садится, как грязь, которой не смыть сразу."],
   leech:["Сила перетекает по тонкой нити.","Чужая жизнь на вкус как медь."],
   patch:["Бинт, спирт, быстрые руки.","Рану затыкают до того, как она успевает спорить."],
-  stim:["Укол — и силы возвращаются рывком.","Сердце стучит громче, чем нужно, но держит."],
+  stim:["Укол — и силы возвращаются рывком.","Сердце стучит громче, чем нужно, но держит.",
+    "Укол в бедро — мир становится резче.","Силы на заём, но сейчас этого хватает."],
   howl:["Вой, который понимают твари.","Стая или страх — для ушей врага одно и то же."],
   bond:["Связь с питомцем вспыхивает.","Существо отвечает, будто ждало команды."],
   firebolt:["Огненная стрела срывается с ладони.","Воздух пахнет гарью ещё до попадания."],
@@ -10164,8 +10244,7 @@ const SKILL_FLAVOR={
   decoy:["На месте — не он.","Враг бьёт воздух с чужим лицом."],
   blur:["Контуры смазаны.","Прицел пляшет, попадания реже."],
   graft:["Симбионт делится силой.","Кровь уходит — сила приходит."],
-  feed:["Внутри что-то ест и отдаёт.","Сделка без бумаг."],
-  stim:["Укол в бедро — мир становится резче.","Силы на заём, но сейчас этого хватает."]
+  feed:["Внутри что-то ест и отдаёт.","Сделка без бумаг."]
 };
 
 const CONFLICTS=[
@@ -12853,7 +12932,14 @@ const GATE_ARTIFACTS={
 function gateArtBonus(k){
   let v=0;
   const eq=Object.values(S.eq||{}).concat(S.inv||[]);
-  eq.forEach(it=>{ if(it&&it.gateArt&&GATE_ARTIFACTS[it.gateArt]&&GATE_ARTIFACTS[it.gateArt].e[k]) v+=GATE_ARTIFACTS[it.gateArt].e[k]; });
+  eq.forEach(it=>{
+    if(!it||!it.gateArt||!GATE_ARTIFACTS[it.gateArt]||!GATE_ARTIFACTS[it.gateArt].e[k]) return;
+    // Ранг артефакта Врат усиливает его эффект: от Обычного/мин.ранга (x1) до Древнего/Небесного (x1.6) —
+    // раньше эффект был одинаков независимо от ранга, из-за чего высокий ранг казался бесполезным.
+    const rk=it.r!==undefined?it.r:3;
+    const rankMul=1+Math.max(0,rk-3)*0.15;
+    v+=GATE_ARTIFACTS[it.gateArt].e[k]*rankMul;
+  });
   return v;
 }
 
@@ -13737,7 +13823,7 @@ function render(){
       $(ti).textContent=lbl+" "+Math.round(v)+"/"+Math.round(m)+(reg!==undefined&&reg!==0?" "+fmtR(reg):""); };
   setb("bHp","tHp",S.hp,d.hpMax,"HP",hpR); setb("bEn","tEn",S.en,d.enMax,"Эфир",enR);
   setb("bSt","tSt",S.st,d.stMax,"Силы",stR);
-  setb("bFd","tFd",S.food,100,"Сытость");
+  setb("bFd","tFd",S.food,100,"Еда");
   setb("bWt","tWt",S.water,100,"Вода");
   $("hCur").innerHTML=`💠 ${S.tok} · 🧬 ${S.evo||0} · ${moraleIcon()} ${S.morale===undefined?50:S.morale}${(S.wanted&&S.wanted.heat>0)?` · 🎯 ${Math.round(S.wanted.heat)}`:""}${S.dirty?" · ⚠":""}`
     +`<div style="font-size:11px;opacity:.85;margin-top:2px">${esc(typeof weatherAtmos==="function"?weatherAtmos():"")}</div>`;
@@ -13798,18 +13884,20 @@ function mapModal(sel){
   RN.forEach(n=>{ const st=S.nodes[n.id];
     if(!st||!st.seen){
       if(st&&nb.includes(n.id)){
-        svg+=`<circle cx="${n.x}" cy="${n.y}" r="1.7" fill="#2A323D" stroke="#4A535F" stroke-width=".5"
-          style="cursor:pointer" onmousedown="lpDown('${n.id}')" onmouseup="lpUp('${n.id}')" onmouseleave="lpCancel()"
-          ontouchstart="lpDown('${n.id}')" ontouchend="lpUp('${n.id}')"/>
-          <text x="${n.x}" y="${n.y+0.9}" text-anchor="middle" font-size="2.4" fill="#8A94A2">?</text>`;
+        svg+=`<circle cx="${n.x}" cy="${n.y}" r="1.7" fill="#2A323D" stroke="#4A535F" stroke-width=".5"/>
+          <text x="${n.x}" y="${n.y+0.9}" text-anchor="middle" font-size="2.4" fill="#8A94A2" style="pointer-events:none">?</text>
+          <circle cx="${n.x}" cy="${n.y}" r="5" fill="transparent"
+          style="cursor:pointer;touch-action:manipulation" onmousedown="lpDown('${n.id}')" onmouseup="lpUp('${n.id}')" onmouseleave="lpCancel()"
+          ontouchstart="lpDown('${n.id}')" ontouchend="lpUp('${n.id}')"/>`;
       }
       return;
     }
     const here=n.id===S.at, adj=nb.includes(n.id), inf=st.inf/100;
     const col=here?"#3FD2C7":inf>0.6?"#C2543C":inf>0.3?"#E8A33D":adj?"#8A94A2":"#4A535F";
     const r=here?3.4:adj?2.6:1.9;
-    svg+=`<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${col}" stroke="#0A0D11" stroke-width=".6"
-      style="cursor:pointer" onmousedown="lpDown('${n.id}')" onmouseup="lpUp('${n.id}')" onmouseleave="lpCancel()"
+    svg+=`<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${col}" stroke="#0A0D11" stroke-width=".6"/>
+      <circle cx="${n.x}" cy="${n.y}" r="${Math.max(r,5)}" fill="transparent"
+      style="cursor:pointer;touch-action:manipulation" onmousedown="lpDown('${n.id}')" onmouseup="lpUp('${n.id}')" onmouseleave="lpCancel()"
       ontouchstart="lpDown('${n.id}')" ontouchend="lpUp('${n.id}')"/>`;
     if(here) svg+=`<circle cx="${n.x}" cy="${n.y}" r="6" fill="none" stroke="#3FD2C7" stroke-opacity=".5" stroke-width=".5"/>`;
     const mk=nodeMark(n.id);
@@ -14145,7 +14233,7 @@ function vMap(){
     ${tutOn()&&tutId()!=="travel"?'<div class="mut">Пока никуда. Сначала закончи то, что просит Система.</div>':""}
     ${!S.krovDone&&!tutOn()?'<div class="mut">Система советует сначала дойти до своих — до «Крова». Остальное открыто после.</div>':""}
     ${(tutOn()&&tutId()!=="travel"?[]:(!S.krovDone?nb.filter(id=>id==="shelter"):nb)).map(id=>{ const n=nodeById(id), st=S.nodes[id];
-      const cost=Math.round(dist(S.at,id)*0.9), hrs=Math.max(1,Math.round(dist(S.at,id)/9));
+      const {cost,hrs}=estimateTravel(id);
       const arriveHour=(S.hour+hrs)%24, willBeNight=(arriveHour>=19&&arriveHour<24)||arriveHour<5;
       return `<button class="item ${tutId()==="travel"?"tut-target":""}" onclick="travel('${id}')">
         <span class="icv">${placePic(n.id,44)}</span>
@@ -14185,6 +14273,7 @@ function vHero(){
     · ранг <span class="${RAR[S.rank||0].c}">${RAR[S.rank||0].n}</span></div>
     ${(S.rank||0)<7?`<button class="btn-main" style="width:100%;margin-top:6px" onclick="evolve()">
       Эволюция до ранга «${RAR[(S.rank||0)+1].n}» — очков эволюции: ${S.evo||0}/${EVOCOST[S.rank||0]}</button>`:""}
+    ${rankGrowthBlock()}
     ${chips}
     <div class="mut" style="margin-top:6px">${moraleIcon()} Мораль: <b>${S.morale===undefined?50:S.morale}</b>/100 — ${moraleText()}</div>
     ${S.ap>0?`<div class="syswin"><div class="t">СВОБОДНЫЕ ОЧКИ: ${S.ap}</div>Распредели характеристики.</div>`:""}
@@ -14194,7 +14283,7 @@ function vHero(){
       <span><b>${S.a[a.k]||0}${d.a[a.k]!==S.a[a.k]?` <span class="mut">(${d.a[a.k]})</span>`:""}</b>${S.ap>0?` <button class="${tutId()==="stats"?"tut-target":""}" style="padding:2px 8px" onclick="spend('${a.k}')">+</button>`:""}</span></div>`).join("")}
     <div class="mut" style="margin:8px 0 4px"><b>Дополнительные</b></div>
     ${ATTRS.filter(a=>a.g==="s").map(a=>`<div class="stat"><span>${a.n} <span class="mut">${a.d}</span></span>
-      <span><b>${S.a[a.k]||0}${d.a[a.k]!==(S.a[a.k]||0)?` <span class="mut">(${d.a[a.k]})</span>`:""}</b>${S.ap>0?` <button class="${tutId()==="stats"?"tut-target":""}" style="padding:2px 8px" onclick="spend('${a.k}')">+</button>`:""}</span></div>`).join("")}
+      <span><b>${S.a[a.k]||0}${d.a[a.k]!==(S.a[a.k]||0)?` <span class="mut">(${d.a[a.k]})</span>`:""}</b>${S.ap>0&&a.k!=="lck"?` <button class="${tutId()==="stats"?"tut-target":""}" style="padding:2px 8px" onclick="spend('${a.k}')">+</button>`:""}</span></div>`).join("")}
   </div>
   <div class="panel"><h3>Производные</h3>
     <div class="stat"><span>Урон</span><b>${d.dmg}</b></div>
@@ -14210,9 +14299,9 @@ function vHero(){
       const stR=okFeed?(0.4*(d.regen||1)*(1+Math.min(1.2,partyTrait("stamregen")))):(S.food<=25||S.water<=25?-1.5:0);
       const enR=okFeed?(2*(d.ethRegen||1)):0;
       const frMul=((S.org==="far")?0.7:1)*(wIs("frost")?1.4:1)*(hasUq("u_ration")?0.5:1)
-        *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12);
+        *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12)*injFoodMult();
       const foodR=-1.1*frMul;
-      const waterMul=(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1);
+      const waterMul=(wIs("rain")?0.6:1)*(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1)*injWaterMult();
       const waterR=-1.6*waterMul;
       const fmt=v=>(v>=0?"+":"")+(Math.round(v*10)/10);
       return `<div class="stat"><span>Здоровье</span><b class="${hpR>=0?"r2":"r6"}">${fmt(hpR)}/ч</b></div>
@@ -14230,7 +14319,7 @@ function vHero(){
     }).join("")}
   </div>`;
 }
-function spend(k){ if(S.ap<=0) return; if(S.a[k]==null) S.a[k]=0; S.ap--; S.a[k]++; const d=derive(S);
+function spend(k){ if(S.ap<=0) return; if(k==="lck") return; if(S.a[k]==null) S.a[k]=0; S.ap--; S.a[k]++; const d=derive(S);
   S.hp=Math.min(S.hp,d.hpMax);
   if(S.ap<=0) tutDone("stats");
   render(); save(); }
@@ -14243,10 +14332,23 @@ function itemScore(it){
   }
   return Math.round(v+(it.uq?12:it.r*2)+it.lvl*0.5);
 }
+function cmpSlotGroup(s){
+  if(s==="wpn") return ["wpn","wpn2"];
+  if(s==="ring") return ["ring","ring2","ring3"].slice(0,ringSlotCount());
+  if(s==="neck") return ["neck","neck2","neck3"].slice(0,neckSlotCount());
+  return [s];
+}
 function cmpEquipped(it){
-  const cur=S.eq[it.s];
-  if(!cur) return {diff:itemScore(it),cur:null};
-  return {diff:itemScore(it)-itemScore(cur),cur};
+  // Сравниваем не только с первым слотом (осн. рука / кольцо 1 / амулет 1),
+  // а со всеми подходящими слотами — и берём тот вариант, где эта вещь даёт наибольшую пользу.
+  const slots=cmpSlotGroup(it.s);
+  let best=null;
+  slots.forEach(sl=>{
+    const cur=S.eq[sl];
+    const diff=cur?itemScore(it)-itemScore(cur):itemScore(it);
+    if(!best||diff>best.diff) best={diff,cur:cur||null};
+  });
+  return best||{diff:itemScore(it),cur:null};
 }
 function diffMark(it){
   const c=cmpEquipped(it);
@@ -14301,8 +14403,8 @@ function useRunwayDays(){
     if(u.heal) healQ+=u.heal*(i.q||1);
   });
   const fr=((S.org==="far")?0.7:1)*(wIs("frost")?1.4:1)*(hasUq("u_ration")?0.5:1)
-    *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12);
-  const wr=(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1);
+    *(1-Math.min(0.5,partyTrait("food")))*(1+combatParty().length*0.12)*injFoodMult();
+  const wr=(wIs("heat")?1.45:1)*(hasUq("u_ration")?0.5:1)*(1-Math.min(0.5,partyTrait("water")))*(1+combatParty().length*0.1)*injWaterMult();
   const foodPerDay=1.1*fr*24, waterPerDay=1.6*wr*24;
   // сколько урона герой в среднем получает за день — берём реальную статистику боёв,
   // а пока данных мало, подстраховываемся консервативной долей от максимума HP
@@ -14398,7 +14500,7 @@ function gearPanel(){
       return (vis.map(i=>`<button class="item ${rbd(i)} ${tutId()==="equip"&&(i.s==="wpn"||i.s==="body")?"tut-target":""}" onclick="showItem('${i.uid}',0)">
       <span class="ic">${i.lock?"🔒":i.ic}</span>
       <span class="nm"><b class="${rcls(i)}">${esc(i.n)}</b>
-      <span class="mut">${rname(i)} · ур.${i.lvl}${i.dmg?" · урон "+i.dmg:""}${i.def?" · защита "+i.def:""}
+      <span class="mut">${SLOT_NAMES[i.s]||i.s} · ${rname(i)} · ур.${i.lvl}${i.dmg?" · урон "+i.dmg:""}${i.def?" · защита "+i.def:""}
       · ${diffMark(i)}</span></span></button>`).join("")||`<div class="mut">${emptyMsg}</div>`)
       +(more>0?`<button class="btn-main" style="width:100%;margin-top:6px" onclick="S.gearShowAll=1;render()">Показать ещё ${more}…</button>`:"");
     })()}
@@ -14527,7 +14629,7 @@ function equipSilent(uid,slotHint){
   let slot=slotHint||it.s;
   if(it.s==="wpn"){
     if(twoHanded(it)){
-      if(S.eq.wpn) S.inv.push(S.eq.wpn);
+      if(S.eq.wpn){ S.inv.push(S.eq.wpn); S.eq.wpn=null; }
       if(S.eq.wpn2){ S.inv.push(S.eq.wpn2); S.eq.wpn2=null; }
       slot="wpn";
     }
@@ -14541,6 +14643,7 @@ function toggleBetterOnly(){ S.invBetterOnly=!S.invBetterOnly; render(); }
 function setSort(k){ S.invSort=k; render(); }
 function setCardFilter(k){ S.cardFilter=k; render(); }
 function setCardSort(k){ S.cardSort=k; render(); }
+function setTitleSort(k){ S.titleSort=k; render(); }
 function cardKey(c){ const cc=typeof c==="string"?{t:"skill",k:c}:c; return (cc.t||"skill")+"|"+(cc.k||""); }
 function isPinned(c){ return (S.pinnedCards||[]).indexOf(cardKey(c))>=0; }
 function togglePin(c,ev){
@@ -14791,7 +14894,7 @@ function scrapSelectMenu(){
       return `<label class="item" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" ${on?"checked":""} onchange="toggleScrapEx('${it.uid}')" style="width:18px;height:18px">
         <span class="ic">${it.ic}</span>
-        <span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b><span class="mut">ур.${it.lvl} · ${rname(it)}</span></span>
+        <span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b><span class="mut">${SLOT_NAMES[it.s]||it.s} · ур.${it.lvl} · ${rname(it)}</span></span>
       </label>`; }).join("")}
     </div>
     <div class="mut" style="margin-top:8px">Выбрано: ${junk.length-junkExcludedCount(junk)}/${junk.length} · ожидаемо: детали +${Math.round(sc)}${fb?", волокно +"+Math.round(fb):""}</div>
@@ -14877,7 +14980,7 @@ function sellMenu(){
       return `<label class="item" style="display:flex;align-items:center;gap:8px;cursor:pointer">
         <input type="checkbox" ${on?"checked":""} onchange="toggleSellEx('${it.uid}')" style="width:18px;height:18px">
         <span class="ic">${it.ic}</span>
-        <span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b><span class="mut">ур.${it.lvl} · ${rname(it)}</span></span>
+        <span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b><span class="mut">${SLOT_NAMES[it.s]||it.s} · ур.${it.lvl} · ${rname(it)}</span></span>
       </label>`; }).join("")}
     </div>
     <div class="mut" style="margin-top:8px">Выбрано: ${junk.length-sellExCount(junk)}/${junk.length} · ожидаемо: кристаллов +${Math.round(sum)}</div>
@@ -15038,8 +15141,9 @@ function showItem(uid,equipped){
       border-radius:12px;background:linear-gradient(160deg,#12171E,#0A0D11);
       border:3px solid ${it.uq?"var(--ru)":"var(--"+RAR[it.r].c+")"}">${it.ic}</div>`}
     <div><h3 class="${rcls(it)}" style="margin:0">${esc(it.n)}</h3>
-    <div class="mut">${rname(it)}${twoHanded(it)?" · двуручное":""}</div></div></div>
+    <div class="mut">${SLOT_NAMES[it.s]||it.s} · ${rname(it)}${twoHanded(it)?" · двуручное":""}</div></div></div>
     <div class="mut" style="color:var(--sys)">${circOf(it).n} · ${esc(circOf(it).d)}</div>
+    ${it.d?`<div class="mut" style="color:var(--sys);margin-top:4px">${esc(it.d)}</div>`:""}
     ${itemLore(it)}
     <div class="mut">уровень ${it.lvl} · прочность ${it.dur}/${it.durMax}
       · вес ${itemWeight(it)} · ценность ${itemScore(it)}${it.carry?" · +"+it.carry+" к переносимому":""}${it.sock?" · гнёзд "+(it.gems||[]).length+"/"+it.sock:""}${it.lock?" · 🔒":""}</div>
@@ -15133,11 +15237,14 @@ function equipTutCheck(){
 function ringSlotCount(){ return 2+(S.skills.includes("jeweler")?1:0); }
 function neckSlotCount(){ return 2+(S.skills.includes("jeweler")?1:0); }
 function actorAttrs(actor){
-  if(!actor) return (S&&S.a)||{};
-  if(actor===S||actor===window.S) return S.a||{};
-  // party member: approximate from lvl/cls
+  if(!actor) return (S&&derive(S).a)||{};
+  if(actor===S||actor===window.S) return derive(S).a||S.a||{};
+  // party member: approximate from lvl/cls, plюс бонусы уже надетого снаряжения
   const a={str:5,agi:5,end:5,vit:5,per:5,int:5,lck:2,cha:2,wil:2};
-  if(actor.a) return Object.assign(a,actor.a);
+  if(actor.a){
+    Object.assign(a,actor.a);
+    try{ return allyPower(actor).a||a; }catch(e){ return a; }
+  }
   const C=typeof CLASSES!=="undefined"&&actor.cls?CLASSES.find(x=>x.k===actor.cls):null;
   if(C&&C.a) for(const k in C.a) a[k]=(a[k]||0)+C.a[k];
   const lv=actor.lvl||1;
@@ -15249,12 +15356,21 @@ function dropItem(uid){ S.inv=S.inv.filter(i=>i.uid!==uid); closeModal(); save()
 function curesFor(id){ return Object.keys(INJ).filter(k=>INJ[k].cure===id); }
 function useDesc(k){
   const u=USABLE[k]; if(!u) return "";
-  if(u.d) return u.d;
   const p=[];
-  if(u.food) p.push("сытость +"+u.food+", силы +"+Math.round(u.food*0.7)+", здоровье +"+Math.round(u.food*0.25));
-  if(u.stam) p.push("силы +"+u.stam+" (напрямую)");
-  if(u.water) p.push("вода +"+u.water+", силы +"+Math.round(u.water*0.4));
+  if(u.d) p.push(u.d);
+  const stamBits=[];
+  if(u.food) stamBits.push({v:Math.round(u.food*0.7),lbl:"сытость"});
+  if(u.water) stamBits.push({v:Math.round(u.water*0.4),lbl:"вода"});
+  if(u.stam) stamBits.push({v:u.stam,lbl:"стимулятор"});
+  const multiStam=stamBits.length>1;
+  if(u.food) p.push("сытость +"+u.food+(multiStam?"":", силы +"+Math.round(u.food*0.7))+", здоровье +"+Math.round(u.food*0.25));
+  if(u.stam&&!multiStam) p.push("силы +"+u.stam+" (напрямую)");
+  if(u.water) p.push("вода +"+u.water+(multiStam?"":", силы +"+Math.round(u.water*0.4)));
+  if(multiStam) p.push("силы всего +"+stamBits.reduce((a,b)=>a+b.v,0)+" ("+stamBits.map(b=>b.lbl+" +"+b.v).join(", ")+")");
   if(u.heal) p.push("восстанавливает "+u.heal+" здоровья"+((u.med||u.cure)?"":" (на травмы и болезни не действует, только аптечка «через раз» или нужное лекарство)"));
+  if(u.healPct) p.push("восстанавливает "+Math.round(u.healPct*100)+"% максимального здоровья");
+  if(u.stamPct) p.push("восстанавливает "+Math.round(u.stamPct*100)+"% максимальных сил");
+  if(u.enPct) p.push("восстанавливает "+Math.round(u.enPct*100)+"% максимального эфира");
   if(u.energy) p.push("эфир +"+u.energy);
   if(u.med||u.cure){ const cs=curesFor(k).map(x=>INJ[x].n);
     p.push(cs.length?"лечит: "+cs.join(", "):(u.med?"лечебное средство":"снимает одно состояние")); }
@@ -15300,6 +15416,10 @@ function useItem(uid,fromCard){
   if(u.stam){ const d0=derive(S); S.st=clamp(S.st+u.stam,0,d0.stMax); log("Силы +"+u.stam+"."); }
   if(u.heal) S.hp=clamp(S.hp+u.heal*(S.org==="doc"?1.3:1)*(1+(d.healp||0)+partyTrait("heal2"))
     *(S.skills.includes("fieldmed")?1.25:1),0,d.hpMax);
+  if(u.healPct){ const v=Math.round(d.hpMax*u.healPct*(S.org==="doc"?1.3:1)*(1+(d.healp||0)+partyTrait("heal2"))*(S.skills.includes("fieldmed")?1.25:1));
+    S.hp=clamp(S.hp+v,0,d.hpMax); log("Здоровье +"+v+" ("+Math.round(u.healPct*100)+"% от максимума)."); }
+  if(u.stamPct){ const d0=derive(S); const v=Math.round(d0.stMax*u.stamPct); S.st=clamp(S.st+v,0,d0.stMax); log("Силы +"+v+" ("+Math.round(u.stamPct*100)+"% от максимума)."); }
+  if(u.enPct){ const v=Math.round(d.enMax*u.enPct); S.en=clamp(S.en+v,0,d.enMax); log("Эфир +"+v+" ("+Math.round(u.enPct*100)+"% от максимума)."); }
   if(u.energy){
     const isStim=(i.use==="stimpack"||i.use==="coffee");
     if(isStim){
@@ -15379,7 +15499,7 @@ function useItem(uid,fromCard){
   if(u.pot){ toast("Отвары действуют только в бою."); return; }
   i.q--; if(i.q<=0) S.inv=S.inv.filter(x=>x!==i);
   log("Использовано: "+i.n+".");
-  if(tutId()==="heal"&&(u.heal||u.food||u.water)) tutDone("heal");
+  if(tutId()==="heal"&&(u.heal||u.healPct||u.food||u.water)) tutDone("heal");
   if(fromCard){ if(i.q>0) showUse(uid); else closeModal(); } else render();
   save();
 }
@@ -15714,6 +15834,36 @@ function vSys(){
   } else {
     cardListHtml='<div class="mut">Карт нет. Они выпадают с тварей, из тайников и Врат.</div>';
   }
+  const tso=S.titleSort||"def";
+  const TGRP={progress:"Прогресс",killer:"Убийца ранга",crusher:"Сокрушитель",luck:"Удача",hunter:"Охотник по виду",rank:"Личный ранг",brake:"Тормоза",special:"Особые"};
+  const titleGrpOf=t=>TGRP[TITLES[t]&&TITLES[t].grp]||"Прочее";
+  let titleOrder=S.titles.slice();
+  if(tso==="az") titleOrder.sort((a,b)=>TITLES[a].n.localeCompare(TITLES[b].n,"ru"));
+  else if(tso==="lvl") titleOrder.sort((a,b)=>(titleLv(b)-titleLv(a))||TITLES[a].n.localeCompare(TITLES[b].n,"ru"));
+  else if(tso==="grp") titleOrder.sort((a,b)=>titleGrpOf(a).localeCompare(titleGrpOf(b),"ru")||TITLES[a].n.localeCompare(TITLES[b].n,"ru"));
+  const titleItemHtml=t=>`<button class="item" onclick="titleDetail('${t}')"><span class="ic">🏅</span>
+      <span class="nm"><b class="r5">${TITLES[t].n}${titleLv(t)>1?" · ст."+titleLv(t):""}</b>
+      <span class="mut">${TITLES[t].d}${titleLv(t)>1?" · эффект ×"+titleLv(t):""}</span></span></button>`;
+  let titleListHtml="";
+  if(titleOrder.length){
+    if(tso==="grp"){
+      let lastG="";
+      titleOrder.forEach(t=>{
+        const g=titleGrpOf(t);
+        if(g!==lastG){
+          const cnt=titleOrder.filter(x=>titleGrpOf(x)===g).length;
+          titleListHtml+=`<div class="group-hdr">${esc(g)} · <span>${cnt}</span></div>`;
+          lastG=g;
+        }
+        titleListHtml+=titleItemHtml(t);
+      });
+    } else titleListHtml=titleOrder.map(titleItemHtml).join("");
+  } else titleListHtml='<div class="mut">Титулов пока нет. Они открываются за особые достижения по ходу истории.</div>';
+  const titleSortRow=S.titles.length>1?`<div class="row" style="margin-bottom:6px">
+    <span class="mut" style="align-self:center;font-size:12px">Сортировка:</span>
+    ${cbtn("def","получение",tso==="def","setTitleSort")}${cbtn("az","алфавит",tso==="az","setTitleSort")}
+    ${cbtn("lvl","ступень",tso==="lvl","setTitleSort")}${cbtn("grp","группы",tso==="grp","setTitleSort")}
+  </div>`:"";
   return `${tutBanner()}<div class="panel"><h2>Система</h2>
     <div class="mut" style="margin-bottom:6px">Пауза, карты и ранг. Цель дня — в шапке. Задания, розыск и история — во вкладке «Записи».</div>
     ${globalSearchBox()}
@@ -15725,10 +15875,8 @@ function vSys(){
     </div>
   </div>
     <div class="panel"><h3>Титулы${S.titles.length?" ("+S.titles.length+")":""}</h3>
-    ${S.titles.length?S.titles.map(t=>`<button class="item" onclick="titleDetail('${t}')"><span class="ic">🏅</span>
-      <span class="nm"><b class="r5">${TITLES[t].n}${titleLv(t)>1?" · ст."+titleLv(t):""}</b>
-      <span class="mut">${TITLES[t].d}${titleLv(t)>1?" · эффект ×"+titleLv(t):""}</span></span></button>`).join("")
-      :'<div class="mut">Титулов пока нет. Они открываются за особые достижения по ходу истории.</div>'}</div>
+    ${titleSortRow}
+    ${titleListHtml}</div>
     <div class="panel"><h3>Карточки${S.cards.length?" ("+S.cards.length+")":""}</h3>
     <div class="mut" style="font-size:12px;margin-bottom:6px">${slotLine}</div>
     ${slotWarnHtml()}
@@ -15881,7 +16029,11 @@ function vParty(){
     return `<div class="item" style="cursor:pointer;display:block" onclick="${p.civ?"civDetail("+i+")":"allySheet("+i+")"}">
       <div style="display:flex;gap:8px;align-items:flex-start">
       <span class="icv">${avatar(p.n,allyKind(p),44)}</span>
-      <span class="nm" style="flex:1"><b>${esc(p.n)}${p.romance?" 💞":p.rom&&p.rom.stage===1?" 🌹":npcCoupleId(p.id)?" 💑":""}${p.away?(p.away.k==="garrison"?" — комендант зоны "+esc(zoneNameOf(p.away.zoneId)):" — на задании до дня "+p.away.until+(p.away.partner?" (с "+esc((S.party.find(x=>x.id===p.away.partner)||{n:"кем-то"}).n)+")":"")):(p.home?" — на базе":"")}</b>
+      <span class="nm" style="flex:1"><b>${esc(p.n)}${p.romance?" 💞":p.rom&&p.rom.stage===1?" 🌹":npcCoupleId(p.id)?" 💑":""}${p.away?(p.away.k==="garrison"?" — комендант зоны "+esc(zoneNameOf(p.away.zoneId))
+        :p.away.kind==="hospital"?" — в лазарете, тяжело ранен (~"+Math.max(1,Math.ceil(((p.away.until||0)-(S.day*24+(S.hour||0)))/24))+" "+plural(Math.max(1,Math.ceil(((p.away.until||0)-(S.day*24+(S.hour||0)))/24)),"день","дня","дней")+")"
+        :p.away.kind==="lag"?" — отстал, догоняет отряд"
+        :p.away.kind==="kennel"?" — в псарне"
+        :" — на задании до дня "+p.away.until+(p.away.partner?" (с "+esc((S.party.find(x=>x.id===p.away.partner)||{n:"кем-то"}).n)+")":"")):(p.home?" — на базе":"")}</b>
       <span class="mut">${clsName(p.cls)} · ${genderLabel(p)} · ур.${p.lvl}${p.trait?` · <span class="sys">${TRAITS[p.trait].n}</span>`:""}
       ${p.civ?"":` · ${Math.round(p.hp)}/${allyPower(p).hpMax} HP · урон ${allyPower(p).dmg} · защита ${allyPower(p).def}`}
       ${p.civ?"":(p.ap||p.sp)?` · <span class="r5">есть нераспределённые очки</span>`:""}</span></span></div>
@@ -16200,8 +16352,10 @@ function meetPerson(r){
   }
   const cond=pick(Object.keys(CONDITIONS));
   S.pendingRec={id:r.id,cond};
+  const tr=TRAITS[r.trait];
   return openModal(`<h3>${esc(r.n)}</h3>
-    <div class="syswin"><div class="t">УСЛОВИЕ</div>
+    ${tr?`<div class="mut" style="margin-top:2px"><b class="r5">${esc(tr.n)}</b><br>${esc(tr.d)}</div>`:""}
+    <div class="syswin" style="margin-top:8px"><div class="t">УСЛОВИЕ</div>
     <b>${CONDITIONS[cond].n}</b><br>${CONDITIONS[cond].d}</div>
     <p class="mut">Согласишься — пойдёт с тобой. Нарушишь — отношение упадёт, а на нуле он уйдёт.</p>
     <div class="row"><button class="btn-main" onclick="acceptRec()">Согласиться</button>
@@ -17365,7 +17519,7 @@ const TUT=[
   why:"Здоровье само растёт только если ты сыт и напоен. Раны и болезни лечатся своими средствами: жгут, шина, антибиотики, жаропонижающее."},
  {id:"class",tab:"sysm",
   t:"С твари выпали карты. Открой «Система»: можно поглотить или оставить на потом.",
-  why:"Класс — только с 10 уровня. Способность можно не брать сразу: отказ иногда выгоднее (титул «Способный Тормоз»). Решение за тобой."},
+  why:()=>"Класс — только с 10 уровня. Способность можно не брать сразу — решение за тобой."+((S.titles&&S.titles.length)?" (отказ иногда выгоднее — титул «Способный Тормоз»)":"")},
  {id:"slot",tab:"skills",
   t:"Открой «Навыки» и поставь активную способность в слот.",
   why:"В бою работает только то, что в слотах. У способностей есть стихия: совпала с классом — получишь созвучие, то есть больше силы и меньше расхода."},
@@ -17423,8 +17577,9 @@ function tutBanner(){
   if(!tutOn()) return "";
   const T=TUT[S.tut];
   const txt=typeof T.t==="function"?T.t():T.t;
+  const whyTxt=typeof T.why==="function"?T.why():T.why;
   return `<div class="syswin"><div class="t">ОБУЧЕНИЕ ${S.tut+1}/${TUT.length}</div>
-    ${esc(txt)}<div class="mut" style="margin-top:6px">${esc(T.why)}</div>
+    ${esc(txt)}<div class="mut" style="margin-top:6px">${esc(whyTxt)}</div>
     <span class="tut-hint">${TAB===T.tab?"Нужная кнопка подсвечена и мигает":
       "Открой вкладку «"+({map:"Карта",hero:"Герой",inv:"Инвентарь",skills:"Навыки",
       sysm:"Система",party:"Отряд",codex:"Записи"})[T.tab]+"» — она мигает внизу экрана"}</span>
@@ -17736,14 +17891,35 @@ function learnVehBp(t){
   if(!S.vehBps.includes(t)){ S.vehBps.push(t); return true; }
   return false;
 }
+function vehDisassembleBaseMats(g,V){
+  const mats={scrap:2+Math.floor((V.price||50)/40), parts:1+Math.floor((V.price||50)/80)};
+  if(V.fuel) mats.oil=(mats.oil||0)+1;
+  if(V.kind==="car"||V.kind==="truck") mats.tire=(mats.tire||0)+1;
+  if(g.upg&&g.upg.length){ mats.parts=(mats.parts||0)+g.upg.length; mats.plating=(mats.plating||0)+(g.upg.includes("armor")?1:0); }
+  return mats;
+}
+function vehDisassembleAsk(id){
+  const g=(S.garage||[]).find(x=>x.id===id); if(!g) return toast("Нет такой машины.");
+  if(S.veh&&S.veh.id===id) return toast("Сначала сними с маршрута — нельзя разбирать то, на чём едешь.");
+  const V=vehOf(g.t);
+  const mats=vehDisassembleBaseMats(g,V);
+  const lines=Object.keys(mats).map(k=>`${USABLE[k]?USABLE[k].ic+" "+USABLE[k].n:k} ×${mats[k]}`).join(", ");
+  const chanceLine=(V.kind==="car"||V.kind==="truck")?"<br><span class=\"mut\">+ шанс на аккумулятор</span>":"";
+  const bpLine=hasVehBp(g.t)?"<br><span class=\"mut\">Чертёж уже есть.</span>":"<br><span class=\"sys\">Плюс изучишь чертёж — можно будет собрать снова.</span>";
+  openModal(`<div class="syswin"><div class="t">РАЗОБРАТЬ?</div>
+    ${g.cond<0?"":""}${esc(V.n)} будет разобран${V.kind==="bike"?"":"а"} безвозвратно.<br>
+    Получишь: ${esc(lines)}.${chanceLine}${bpLine}</div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn-danger" onclick="vehDisassemble('${id}')">Разобрать</button>
+      <button onclick="garageMenu()">Отмена</button>
+    </div>`,true);
+}
 function vehDisassemble(id){
   const g=(S.garage||[]).find(x=>x.id===id); if(!g) return toast("Нет такой машины.");
   if(S.veh&&S.veh.id===id) return toast("Сначала сними с маршрута — нельзя разбирать то, на чём едешь.");
   const V=vehOf(g.t);
-  const mats={scrap:2+Math.floor((V.price||50)/40), parts:1+Math.floor((V.price||50)/80)};
-  if(V.fuel) mats.oil=(mats.oil||0)+1;
-  if(V.kind==="car"||V.kind==="truck"){ mats.tire=(mats.tire||0)+1; mats.battery=(mats.battery||0)+(Math.random()<0.6?1:0); }
-  if(g.upg&&g.upg.length){ mats.parts=(mats.parts||0)+g.upg.length; mats.plating=(mats.plating||0)+(g.upg.includes("armor")?1:0); }
+  const mats=vehDisassembleBaseMats(g,V);
+  if(V.kind==="car"||V.kind==="truck") mats.battery=(mats.battery||0)+(Math.random()<0.6?1:0);
   const gotBp=learnVehBp(g.t);
   Object.keys(mats).forEach(k=>addUse(S,k,mats[k]));
   S.garage=S.garage.filter(x=>x.id!==id);
@@ -17940,10 +18116,8 @@ function vehMenu(){
         ${vehPic(v.t,56)}
         <span class="mut">${K?K.n+" · "+K.label:""}<br>${esc(V.d||"")}</span>
       </div>
-      <span class="mut" style="display:none">${K?K.n+" · "+K.label:""}</span><br>
-      ${V.d}<br>
       <b>Состояние ${Math.round(v.cond)}%</b> · топливо за переход: ${V.fuel||"не нужно"} · кузов ${Math.round(vehInvWeight())}/${V.carry}<br>
-      Время ×${V.spd} · силы ×${V.st}</div>
+      Время в пути ×${V.spd} · трата сил ×${V.st} <span class="mut">(меньше единицы — быстрее и легче, чем пешком)</span></div>
       <div class="mut">Топлива: ${matQ("fuel")} · запчастей: ${matQ("parts")}</div>
       <div class="row" style="margin-top:6px;flex-wrap:wrap">
         <button class="btn-main" onclick="vehRepair()">Починить активный</button>
@@ -17966,7 +18140,7 @@ function vehMenu(){
           ${!on&&g.cond>0?`<button class="btn-main" style="padding:4px 8px" onclick="vehSetActive('${g.id}')">В путь</button>`:""}
           ${g.cond<100?`<button style="padding:4px 8px" onclick="vehRepairOne('${g.id}')">Починить</button>`:""}
           <button style="padding:4px 8px" onclick="vehUpgradeMenu('${g.id}')">Улучшить</button>
-          ${!on?`<button style="padding:4px 8px" onclick="vehDisassemble('${g.id}')">Разобрать</button>`:""}
+          ${!on?`<button style="padding:4px 8px" onclick="vehDisassembleAsk('${g.id}')">Разобрать</button>`:""}
           ${!on?`<button style="padding:4px 8px" onclick="vehSell('${g.id}')">Продать</button>`:""}
           <button class="btn-danger" style="padding:4px 8px" onclick="vehRemoveFromGarage('${g.id}')">Списать</button>
         </div>
@@ -17982,13 +18156,13 @@ function vehTrunk(){
   openModal(`<h3>🧳 Кузов</h3>
     <div class="mut">Занято: ${Math.round(used)}/${cap}. Пока машина едет или стоит без остановки, до кузова в бою не дотянуться — только на стоянке.</div>
     <hr><h3>В кузове</h3>
-    ${inTrunk.length?inTrunk.map((it,i)=>`<button class="item ${rbd(it)}" onclick="vehTrunkTake(${i})">
-      <span class="ic">${it.ic}</span><span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b>
-      <span class="mut">${rname(it)} · вес ${itemWeight(it)} · забрать в рюкзак</span></span></button>`).join(""):'<div class="mut">Пусто.</div>'}
+    ${inTrunk.length?inTrunk.map((it,i)=>`<button class="item ${it.use?"":rbd(it)}" onclick="vehTrunkTake(${i})">
+      <span class="ic">${it.ic}</span><span class="nm"><b class="${it.use?"":rcls(it)}">${esc(it.n)}</b>
+      <span class="mut">${it.use?"расходник":rname(it)} · вес ${itemWeight(it)} · забрать в рюкзак</span></span></button>`).join(""):'<div class="mut">Пусто.</div>'}
     <hr><h3>Загрузить из рюкзака</h3>
-    ${carried.length?carried.map(it=>`<button class="item ${rbd(it)}" onclick="vehTrunkPut('${it.uid}')">
-      <span class="ic">${it.ic}</span><span class="nm"><b class="${rcls(it)}">${esc(it.n)}</b>
-      <span class="mut">${rname(it)} · вес ${itemWeight(it)}</span></span></button>`).join(""):'<div class="mut">Рюкзак пуст.</div>'}`);
+    ${carried.length?carried.map(it=>`<button class="item ${it.use?"":rbd(it)}" onclick="vehTrunkPut('${it.uid}')">
+      <span class="ic">${it.ic}</span><span class="nm"><b class="${it.use?"":rcls(it)}">${esc(it.n)}</b>
+      <span class="mut">${it.use?"расходник":rname(it)} · вес ${itemWeight(it)}</span></span></button>`).join(""):'<div class="mut">Рюкзак пуст.</div>'}`);
 }
 function vehTrunkPut(uid){
   const it=S.inv.find(i=>i.uid===uid); if(!it) return;
@@ -18733,32 +18907,63 @@ function bldPeople(b,next){
       onclick="resolveChoice('${key}',${i})">${esc(o[0])}</button>`).join("")}`,true);
 }
 function bpHelp(sc,genuine){
-  let res;
-  if(genuine){
-    const r=Math.random();
-    if(r<0.35){
-      const rec=pick(RECRUITS.filter(x=>!S.party.find(p=>p.id===x.id)));
-      if(rec&&(S.party||[]).filter(p=>!p.civ).length<capCombat()){
-        const wLoss=Math.min(S.water,rnd(3,6));
-        S.water=clamp(S.water-wLoss,0,100);
-        doRecruit(rec,pick(Object.keys(CONDITIONS)));
-        res="Ты вытаскиваешь человека и делишься водой. "+rec.n+" идёт с тобой: «Мне всё равно некуда». (Воды −"+Math.round(wLoss)+".)";
-      }
-    }
-    if(!res&&r<0.7){
-      const founded=Object.keys(S.hubs||{}).filter(k=>S.hubs[k].found);
-      if(founded.length){ const id=founded[0]; hubGrow(id,1,"спасённый дошёл до людей"); repShift("krov",1); }
-      S.tok+=rnd(10,30); moraleShift(3,"помог нуждающимся");
-      res="Ты выводишь их наружу и объясняешь дорогу к людям. Тебе отдают всё, что было в карманах.";
-    }
-    if(!res){
-      const g=[genLoot(nodeById(S.at),derive(S),lootRankRoll(lvRank(S.lvl),extraRank()))];
-      moraleShift(3,"помог нуждающимся");
-      res="Человека ты вытащил. Он отдаёт то, ради чего сюда лез:<div class='syswin'>"+g.map(lootLine).join("")+"</div>";
-    }
-  } else {
+  if(!genuine){
     setTimeout(()=>{ if(!CBT.on) queueModal(()=>hitContract(nodeById(S.at),"Те, кто звал")); },350);
-    res="Ты подходишь ближе — и понимаешь по чужому дыханию за спиной, что это была не просьба.";
+    openModal(`<div class="syswin"><div class="t">РЕЗУЛЬТАТ</div>Ты подходишь ближе — и понимаешь по чужому дыханию за спиной, что это была не просьба.</div>
+      <button class="btn-main" onclick="closeModal()">Дальше</button>`,true);
+    save();
+    return;
+  }
+  const r=Math.random();
+  if(r<0.35){
+    const rec=pick(RECRUITS.filter(x=>!S.party.find(p=>p.id===x.id)));
+    if(rec&&(S.party||[]).filter(p=>!p.civ).length<capCombat()){
+      // Показываем пассивку и условие ДО того, как брать человека с собой — не после.
+      const cond=pick(Object.keys(CONDITIONS));
+      const tr=TRAITS[rec.trait];
+      S.pendingBpRec={rec,cond};
+      openModal(`<div class="syswin"><div class="t">${esc(rec.n.toUpperCase())}</div>
+        <p>${esc(rec.d)}</p>
+        ${tr?`<div class="mut" style="margin-top:6px"><b class="r5">${esc(tr.n)}</b><br>${esc(tr.d)}</div>`:""}</div>
+        <div class="syswin" style="margin-top:8px"><div class="t">УСЛОВИЕ</div>
+        <b>${esc(CONDITIONS[cond].n)}</b><br>${esc(CONDITIONS[cond].d)}</div>
+        <p class="mut">Согласишься — пойдёт с тобой. Нарушишь условие — отношение упадёт, а на нуле он уйдёт.</p>
+        <div class="row">
+        <button class="btn-main" onclick="bpHelpAcceptRecruit()">Взять с собой</button>
+        <button onclick="bpHelpDeclineRecruit()">Отпустить, помочь иначе</button>
+        </div>`,true);
+      return;
+    }
+  }
+  bpHelpOutcome();
+}
+function bpHelpAcceptRecruit(){
+  const p=S.pendingBpRec; S.pendingBpRec=null; if(!p) return;
+  const wLoss=Math.min(S.water,rnd(3,6));
+  S.water=clamp(S.water-wLoss,0,100);
+  doRecruit(p.rec,p.cond);
+  const res="Ты вытаскиваешь человека и делишься водой. "+p.rec.n+" идёт с тобой: «Мне всё равно некуда». (Воды −"+Math.round(wLoss)+".)";
+  openModal(`<div class="syswin"><div class="t">РЕЗУЛЬТАТ</div>${res}</div>
+    <button class="btn-main" onclick="closeModal()">Дальше</button>`,true);
+  save();
+}
+function bpHelpDeclineRecruit(){
+  S.pendingBpRec=null;
+  bpHelpOutcome();
+}
+function bpHelpOutcome(){
+  let res;
+  const r2=Math.random();
+  if(r2<0.6){
+    const founded=Object.keys(S.hubs||{}).filter(k=>S.hubs[k].found);
+    if(founded.length){ const id=founded[0]; hubGrow(id,1,"спасённый дошёл до людей"); repShift("krov",1); }
+    const tokGain=rnd(10,30);
+    S.tok+=tokGain; moraleShift(3,"помог нуждающимся");
+    res="Ты выводишь их наружу и объясняешь дорогу к людям. Тебе отдают всё, что было в карманах. (+"+tokGain+" 💠)";
+  } else {
+    const g=[genLoot(nodeById(S.at),derive(S),lootRankRoll(lvRank(S.lvl),extraRank()))];
+    moraleShift(3,"помог нуждающимся");
+    res="Человека ты вытащил. Он отдаёт то, ради чего сюда лез:<div class='syswin'>"+g.map(lootLine).join("")+"</div>";
   }
   openModal(`<div class="syswin"><div class="t">РЕЗУЛЬТАТ</div>${res}</div>
     <button class="btn-main" onclick="closeModal()">Дальше</button>`,true);
@@ -18796,17 +19001,19 @@ function bldEvent(b,next){
     ()=>{ S.hp=clamp(S.hp-Math.round(derive(S).hpMax*0.08),1,9999);
       return "Пол проваливается под ногой. Ушиб и ссадины."; },
     ()=>{ const c=mkCard("skill",rollSkillKey()||"ironskin",rnd(1,3)); S.cards.push(c); noteCard(c);
-      return "На столе лежит карта Системы: "+cardName(c)+"."; },
+      return "На столе лежит карта Системы: <span class=\""+RAR[c.r||0].c+"\">"+esc(cardName(c))+"</span> <span class=\"mut\">— "+RAR[c.r||0].n+"</span>."; },
     ()=>{ const t=rnd(5,15); S.tok+=t; return "В шкатулке кристаллы: +"+t+" 💠."; },
     ()=>{ addUse(S,"zonecore",Math.random()<0.06?1:0);
       return "Чей-то дневник. Последняя запись про то, куда ушли соседи."; },
     ()=>{ const p=pick(PETS); S.pets.push(mkPetFromDef(p));
-      return "В комнате прячется "+p.n.toLowerCase()+". Пошёл за тобой."; },
+      return "В комнате прячется "+p.n.toLowerCase()+" ("+RAR[p.r||0].n+"). Пошёл за тобой."; },
     ()=>{ const pq=rnd(1,3), fq=rnd(0,2); addUse(S,"parts",pq); if(fq) addUse(S,"fuel",fq);
       return "Верстак с запчастями и канистра в углу: запчасти +"+pq+(fq?", топливо +"+fq:"")+"."; },
     ()=>{ if(!S.veh&&["garage","hangar","ware"].includes(b.t)&&Math.random()<0.5){
-        vehGain(b.t==="hangar"?vehPickKind(pick(["truck","car"])):vehPickKind(pick(["bike","moto","car"])));
-        return "Под брезентом стоит транспорт. Он заводится."; }
+        const t=b.t==="hangar"?vehPickKind(pick(["truck","car"])):vehPickKind(pick(["bike","moto","car"]));
+        vehGain(t);
+        const V=vehOf(t), K=VEH_KIND[vehKindOf(t)]||{};
+        return "Под брезентом стоит "+V.ic+" "+esc(V.n)+" · "+(K.n||"")+" · груз "+V.carry+" · топл. "+V.fuel+". Заводится с полпинка — теперь она твоя ("+S.veh.cond+"%)."; }
       addUse(S,"parts",2); return "Под брезентом только рама и ржавчина. Снял запчасти ×2."; }
   ];
   const txt=pick(evs)();
@@ -21038,7 +21245,10 @@ const CRAFT_RECIPES=[
   {id:"molotov",n:"Коктейль",need:{fiber:2,scrap:1}},
   {id:"smoke",n:"Дымовая шашка",need:{scrap:2}},
   {id:"barbwire",n:"Колючка ×2",need:{scrap:3}},
-  {id:"sandbag",n:"Мешки ×2",need:{fiber:2,scrap:1}}
+  {id:"sandbag",n:"Мешки ×2",need:{fiber:2,scrap:1}},
+  {id:"regenkit",n:"Набор регенерации (35% HP)",need:{essence:3,spark:1,fiber:2}},
+  {id:"vigorcore",n:"Концентрат сил (35%)",need:{essence:3,spark:1,scrap:2}},
+  {id:"ethercore",n:"Эфирный конденсат (35%)",need:{essence:3,spark:1}}
 ];
 let CRAFT_QUEUE=new Set();
 function craftCan(rec){ return Object.keys(rec.need).every(k=>matQ(k)>=rec.need[k]); }

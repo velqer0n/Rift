@@ -373,12 +373,10 @@ const VEH_KIND_MAP = {
 const RAR_COL = {
   4: {a:"#E8A33D", b:"#6B4E1B", g:"#ffc878"},
   5: {a:"#E8514D", b:"#6B2523", g:"#ff8a80"},
-  6: {a:"#2FBFA8", b:"#1B5A50", g:"#6 indecent"},
+  6: {a:"#2FBFA8", b:"#1B5A50", g:"#7ee0d0"},
   7: {a:"#EDEBFF", b:"#8E8FB8", g:"#ffffff"},
   u:  {a:"#FF8A3D", b:"#8A4517", g:"#ffb070"}
 };
-// fix typo in rar 6
-RAR_COL[6] = {a:"#2FBFA8", b:"#1B5A50", g:"#7ee0d0"};
 
 function itemMotif(it){
   const s = (it && it.s) || "art";
